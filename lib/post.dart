@@ -4,5 +4,6 @@ class Post{
   int likes;
   int comments;
   String body;
-  Post({required this.id, required this.name, required this.body,required this.likes,required this.comments});
+  String user;
+  Post({required this.id, required this.name, required this.body,required this.likes,required this.comments,required this.user});
 }

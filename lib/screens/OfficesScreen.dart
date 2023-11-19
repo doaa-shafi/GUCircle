@@ -11,9 +11,6 @@ class OfficesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Offices and outlets'),
-      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: ListView(
