@@ -4,16 +4,16 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
 
-class UploadAcademicQuestionScreen extends StatefulWidget {
-  const UploadAcademicQuestionScreen({super.key});
+class UploadEventScreen extends StatefulWidget {
+  const UploadEventScreen({super.key});
 
   @override
-  State<UploadAcademicQuestionScreen> createState() =>
+  State<UploadEventScreen> createState() =>
       _UploadLostAndFoundScreenState();
 }
 
 class _UploadLostAndFoundScreenState
-    extends State<UploadAcademicQuestionScreen> {
+    extends State<UploadEventScreen> {
   File? selectedImage;
   Future pickImageFromGalary() async {
     final returenedImage =
@@ -104,29 +104,28 @@ class _UploadLostAndFoundScreenState
                             GestureDetector(
                               onTap: () => {
                                 setState(() {
-                                  category = "Courses";
+                                  category = "News";
                                 })
                               },
                               child: Container(
                                 padding: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                     border: Border.all(
-                                        color: category == "Courses"
+                                        color: category == "News"
                                             ? Colors.white
                                             : Color.fromARGB(255, 255, 208, 0)),
                                     borderRadius: BorderRadius.circular(10.0),
-                                    color: category == "Courses"
-                                        ? Color.fromARGB(50, 255, 208, 0)
+                                    color: category == "News"
+                                        ? Color.fromARGB(255, 255, 230, 0)
                                         : Colors.white),
                                 child: Text(
-                                  "Courses",
+                                  "News",
                                   style: TextStyle(
-                                      color: category == "Courses"
-                                          ? const Color.fromARGB(
-                                              255, 255, 208, 0)
+                                      color: category == "News"
+                                          ? Colors.white
                                           : const Color.fromARGB(
                                               255, 255, 208, 0),
-                                      fontWeight: category == "Courses"
+                                      fontWeight: category == "News"
                                           ?FontWeight.bold
                                           :FontWeight.w500),
                                 ),
@@ -138,24 +137,24 @@ class _UploadLostAndFoundScreenState
                             GestureDetector(
                               onTap: () => {
                                 setState(() {
-                                  category = "Stuff";
+                                  category = "Event";
                                 })
                               },
                               child: Container(
                                 padding: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                     border: Border.all(
-                                        color: category == "Stuff"
+                                        color: category == "Event"
                                             ? Colors.white
                                             : Color.fromARGB(255, 255, 208, 0)),
                                     borderRadius: BorderRadius.circular(10.0),
-                                    color: category == "Stuff"
+                                    color: category == "Event"
                                         ? const Color.fromARGB(150, 255, 208, 0)
                                         : Colors.white),
                                 child: Text(
-                                  "Stuff",
+                                  "Event",
                                   style: TextStyle(
-                                      color: category == "Stuff"
+                                      color: category == "Event"
                                           ? Colors.white
                                           : const Color.fromARGB(
                                               255, 255, 208, 0)),
@@ -168,24 +167,24 @@ class _UploadLostAndFoundScreenState
                             GestureDetector(
                               onTap: () => {
                                 setState(() {
-                                  category = "Books";
+                                  category = "Club";
                                 })
                               },
                               child: Container(
                                 padding: EdgeInsets.all(10),
                                 decoration: BoxDecoration(
                                     border: Border.all(
-                                        color: category == "Books"
+                                        color: category == "Club"
                                             ? Colors.white
                                             : Color.fromARGB(255, 255, 208, 0)),
                                     borderRadius: BorderRadius.circular(10.0),
-                                    color: category == "Books"
+                                    color: category == "Club"
                                         ? const Color.fromARGB(150, 255, 208, 0)
                                         : Colors.white),
                                 child: Text(
-                                  "Books",
+                                  "Club",
                                   style: TextStyle(
-                                      color: category == "Books"
+                                      color: category == "Club"
                                           ? Colors.white
                                           : const Color.fromARGB(
                                               255, 255, 208, 0)),

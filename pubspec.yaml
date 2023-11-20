@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_sticky_widgets: ^0.0.3
   image_picker: ^1.0.4
+  flutter_phone_direct_caller: ^2.1.1
 
 dev_dependencies:
   flutter_test:

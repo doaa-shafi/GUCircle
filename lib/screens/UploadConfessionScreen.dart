@@ -26,82 +26,87 @@ class _UploadLostAndFoundScreenState extends State<UploadConfessionScreen> {
     return Scaffold(
       appBar: AppBar(title: Text('Add confession')
       ,backgroundColor: Colors.black,),
-      body: Container(
-        padding: EdgeInsets.all(20),
-        child: Column(
-          children: [
-            Container(
-              height: 400,
-              padding: EdgeInsets.all(10),
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
-                  //set border radius more than 50% of height and width to make circle
-                ),
-                child: Container(
-                  padding: EdgeInsets.all(15),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      TextField(
-                        decoration: InputDecoration(
-                            labelText: 'What is your confession....',
-                            border: InputBorder.none),
-                        controller: lostItemDesc,
-                      ),
-                      GestureDetector(
-                        onTap: () => {changeAnonymous()},
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            Container(
-                              child: anonymous
-                                  ? Image.asset(
-                                      "assets/silent.png",
-                                    )
-                                  : Image.asset(
-                                      "assets/silent1.png",
-                                    ),
-                              width: 30,
-                              height: 30,
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            Container(
-                                padding: EdgeInsets.fromLTRB(20, 6, 20, 6),
-                                decoration: BoxDecoration(
-                                    border: Border.all(color: Colors.grey),
-                                    borderRadius: BorderRadius.circular(10)),
-                                child: anonymous?Text("anonymous"):Text("post it anonymously?"))
-                          ],
+      body: SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.all(10),
+          child: Column(
+            children: [
+              Container(
+                padding: EdgeInsets.all(10),
+                child: Card(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    //set border radius more than 50% of height and width to make circle
+                  ),
+                  child: Container(
+                    padding: EdgeInsets.fromLTRB(15, 15, 15, 30),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        TextField(
+                          keyboardType: TextInputType.multiline,
+                          minLines: 1, 
+                          maxLines: 10,
+                          decoration: InputDecoration(
+                              labelText: 'What is your confession....',
+                              border: InputBorder.none),
+                          controller: lostItemDesc,
                         ),
-                      )
-                    ],
+                        SizedBox(height: 200,),
+                        GestureDetector(
+                          onTap: () => {changeAnonymous()},
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                child: anonymous
+                                    ? Image.asset(
+                                        "assets/silent.png",
+                                      )
+                                    : Image.asset(
+                                        "assets/silent1.png",
+                                      ),
+                                width: 30,
+                                height: 30,
+                              ),
+                              SizedBox(
+                                width: 10,
+                              ),
+                              Container(
+                                  padding: EdgeInsets.fromLTRB(20, 6, 20, 6),
+                                  decoration: BoxDecoration(
+                                      border: Border.all(color: Colors.grey),
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: anonymous?Text("anonymous"):Text("post it anonymously?"))
+                            ],
+                          ),
+                        )
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-            ElevatedButton(
-              onPressed: null,
-              child: Text(
-                "Post",
-                style: TextStyle(color: Colors.white),
+              SizedBox(
+                height: 20,
               ),
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.resolveWith((states) {
-                  // If the button is pressed, return green, otherwise blue
-                  if (states.contains(MaterialState.pressed)) {
+              ElevatedButton(
+                onPressed: null,
+                child: Text(
+                  "Post",
+                  style: TextStyle(color: Colors.white),
+                ),
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.resolveWith((states) {
+                    // If the button is pressed, return green, otherwise blue
+                    if (states.contains(MaterialState.pressed)) {
+                      return Colors.red[500];
+                    }
                     return Colors.red[500];
-                  }
-                  return Colors.red[500];
-                }),
-              ),
-            )
-          ],
+                  }),
+                ),
+              )
+            ],
+          ),
         ),
       ),
     );

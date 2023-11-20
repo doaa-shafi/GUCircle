@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import '../number.dart';
 
 class ImportantNumbersScreen extends StatelessWidget {
   List numbers = [
-    Number(id: "0", number: "01012345678", name: "clinic"),
+    Number(id: "0", number: "00201092226442", name: "clinic"),
     Number(id: "0", number: "01012345678", name: "clinic"),
     Number(id: "0", number: "01012345678", name: "clinic"),
   ];
+  
 
   @override
   Widget build(BuildContext context) {
@@ -35,10 +37,13 @@ class ImportantNumbersScreen extends StatelessWidget {
             Divider(),
             Column(
                 children: numbers.map((num) {
-              return Card(
-                child: ListTile(
-                  title: Text(num.name),
-                  trailing: Text(num.number),
+              return GestureDetector(
+                onTap: ()async{await FlutterPhoneDirectCaller.callNumber(num.number);},
+                child: Card(
+                  child: ListTile(
+                    title: Text(num.name),
+                    trailing: Text(num.number),
+                  ),
                 ),
               );
             }).toList()),

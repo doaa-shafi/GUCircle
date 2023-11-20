@@ -5,7 +5,9 @@ import 'package:gucircle/screens/ImportantNumbersScreen.dart';
 import 'package:gucircle/screens/LostAndFoundScreen.dart';
 import 'package:gucircle/screens/MainDrawer.dart';
 import 'package:gucircle/screens/OfficesScreen.dart';
+import 'package:gucircle/screens/UploadAcademicQuestionScreen.dart';
 import 'package:gucircle/screens/UploadConfessionScreen.dart';
+import 'package:gucircle/screens/UploadEventScreen.dart';
 import 'package:gucircle/screens/UploadLostAndFoundScreen.dart';
 
 class TabsControllerScreen extends StatefulWidget {
@@ -28,12 +30,12 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
   }
   gotoUploadAcademicQuestion(BuildContext myContext) {
     Navigator.of(myContext).push(MaterialPageRoute(builder: (ctxDummy) {
-      return UploadConfessionScreen();
+      return UploadAcademicQuestionScreen();
     }));
   }
   goToUploadEvent(BuildContext myContext) {
     Navigator.of(myContext).push(MaterialPageRoute(builder: (ctxDummy) {
-      return UploadConfessionScreen();
+      return UploadEventScreen();
     }));
   }
   goToUploadRating(BuildContext myContext) {
@@ -88,7 +90,7 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
                             children: [
                               Container(
                                 padding: EdgeInsets.all(20),
-                                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(0.10),color: Color.fromARGB(50, 255, 150, 64),),
+                                              decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.0),color: Color.fromARGB(50, 255, 150, 64),),
                                               child: Image.asset(
                                 "assets/open-book.png",
                                width: 40,
