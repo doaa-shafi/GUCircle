@@ -8,11 +8,13 @@ class ImportantNumbersScreen extends StatelessWidget {
     Number(id: "0", number: "01012345678", name: "clinic"),
     Number(id: "0", number: "01012345678", name: "clinic"),
   ];
-  
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text("Important Numbers"),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: ListView(
@@ -33,12 +35,17 @@ class ImportantNumbersScreen extends StatelessWidget {
                     )),
               ),
             ),
-            Text("Health",style: TextStyle(color: Color.fromARGB(255, 255, 208, 0)),),
+            Text(
+              "Health",
+              style: TextStyle(color: Color.fromARGB(255, 255, 208, 0)),
+            ),
             Divider(),
             Column(
                 children: numbers.map((num) {
               return GestureDetector(
-                onTap: ()async{await FlutterPhoneDirectCaller.callNumber(num.number);},
+                onTap: () async {
+                  await FlutterPhoneDirectCaller.callNumber(num.number);
+                },
                 child: Card(
                   child: ListTile(
                     title: Text(num.name),
@@ -48,7 +55,10 @@ class ImportantNumbersScreen extends StatelessWidget {
               );
             }).toList()),
             Divider(),
-            Text("IT",style:TextStyle(color: Color.fromARGB(255, 255, 208, 0)),),
+            Text(
+              "IT",
+              style: TextStyle(color: Color.fromARGB(255, 255, 208, 0)),
+            ),
             Divider(),
             Column(
                 children: numbers.map((num) {
@@ -60,7 +70,10 @@ class ImportantNumbersScreen extends StatelessWidget {
               );
             }).toList()),
             Divider(),
-            Text("hotlines", style: TextStyle(color: Color.fromARGB(255, 255, 208, 0)),),
+            Text(
+              "hotlines",
+              style: TextStyle(color: Color.fromARGB(255, 255, 208, 0)),
+            ),
             Divider(),
             Column(
                 children: numbers.map((num) {

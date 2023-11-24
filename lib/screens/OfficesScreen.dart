@@ -11,6 +11,9 @@ class OfficesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Maps'),
+      ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: ListView(
