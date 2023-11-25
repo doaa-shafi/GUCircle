@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@nativescript/core": "^8.2.0",
+    "nativescript-plugin-firebase": "^10.6.3"
+  }
+}

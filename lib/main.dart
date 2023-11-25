@@ -1,3 +1,5 @@
+
+
 import 'package:flutter/material.dart';
 import 'package:gucircle/screens/ConfessionsScreen.dart';
 import 'package:gucircle/screens/ImportantNumbersScreen.dart';
@@ -8,8 +10,16 @@ import 'package:gucircle/screens/TabControllerScreen.dart';
 import 'package:gucircle/screens/UploadLostAndFoundScreen.dart';
 import './screens/EventsScreen.dart';
 import './screens/LoginScreen.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    print('Error initializing Firebase here : $e');
+  }
+
   runApp(MyApp());
 }
 
@@ -34,7 +44,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: primaryBlack,
         ),
-        initialRoute: '/',
+        initialRoute: '/signupRoute',
         routes: {
           '/': (ctx) => TabsControllerScreen(),
           '/loginRoute': (ctx) => LoginScreen(),

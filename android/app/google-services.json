@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "616995132376",
+    "project_id": "gucircle-79792",
+    "storage_bucket": "gucircle-79792.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:616995132376:android:c4227d64e65bc39226d8ad",
+        "android_client_info": {
+          "package_name": "com.example.gucircle"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6IJ0qU_6dGgKmRYx_N4WKToFjYw6RAr4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
