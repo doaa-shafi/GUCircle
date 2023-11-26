@@ -1,5 +1,3 @@
-
-
 import 'package:flutter/material.dart';
 import 'package:gucircle/screens/ConfessionsScreen.dart';
 import 'package:gucircle/screens/ImportantNumbersScreen.dart';
@@ -8,6 +6,7 @@ import 'package:gucircle/screens/OfficesScreen.dart';
 import 'package:gucircle/screens/SignUpScreen.dart';
 import 'package:gucircle/screens/TabControllerScreen.dart';
 import 'package:gucircle/screens/UploadLostAndFoundScreen.dart';
+import 'package:gucircle/screens/profileScreen.dart';
 import './screens/EventsScreen.dart';
 import './screens/LoginScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -44,7 +43,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: primaryBlack,
         ),
-        initialRoute: '/signupRoute',
+        initialRoute: '/loginRoute',
         routes: {
           '/': (ctx) => TabsControllerScreen(),
           '/loginRoute': (ctx) => LoginScreen(),
@@ -54,7 +53,8 @@ class MyApp extends StatelessWidget {
           '/uploadlostandfoundRoute': (ctx) => UploadLostAndFoundScreen(),
           '/confessionsRoute': (ctx) => ConfessionsScreen(),
           '/officesRoute': (ctx) => OfficesScreen(),
-          '/eventsRoute': (ctx) => EventsScreen()
+          '/eventsRoute': (ctx) => EventsScreen(),
+          '/profileRoute': (ctx) => ProfileScreen(),
         });
   }
 }

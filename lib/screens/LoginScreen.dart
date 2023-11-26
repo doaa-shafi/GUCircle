@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import './SignUpScreen.dart';
 
 class LoginScreen extends StatelessWidget {
   final email = TextEditingController();
   final password = TextEditingController();
+  FirebaseAuth auth = FirebaseAuth.instance;
+
   navigateToSingupPage(BuildContext myContext) {
     Navigator.of(myContext).push(MaterialPageRoute(builder: (ctxDummy) {
       return SignUpScreen();
@@ -12,6 +15,90 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Future<void> login() async {
+      try {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Logging in...'),
+              content: Text('Please wait...'),
+              actions: [],
+            );
+          },
+        );
+        UserCredential userCredential = await auth.signInWithEmailAndPassword(
+          email: email.text,
+          password: password.text,
+        );
+
+        User? user = userCredential.user;
+        if (user != null) {
+          if (user.emailVerified) {
+            print('User signed in: ${user.uid}');
+            Navigator.of(context).pushReplacementNamed('/profileRoute');
+          } else {
+            Navigator.pop(context);
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Error'),
+                  content: Text('Please verify your email first'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+          }
+        }
+      } catch (e) {
+        String errorMessage;
+        if (e is FirebaseAuthException) {
+          switch (e.code) {
+            case 'invalid-email':
+              errorMessage = 'The email address is not valid.';
+              break;
+            case 'user-disabled':
+              errorMessage =
+                  'The user corresponding to the given email has been disabled.';
+              break;
+            case 'user-not-found':
+              errorMessage =
+                  'There is no user corresponding to the given email.';
+              break;
+            case 'wrong-password':
+              errorMessage = 'The password is invalid for the given email.';
+              break;
+            default:
+              errorMessage = 'email or pasword is incorrect.';
+          }
+        } else {
+          errorMessage = 'An error occurred.';
+        }
+        Navigator.pop(context);
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Error'),
+              content: Text(errorMessage),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
@@ -23,13 +110,14 @@ class LoginScreen extends StatelessWidget {
                 children: [
                   Container(
                       width: 50,
-                      height: 100, 
+                      height: 100,
                       // decrease size of image
                       child: Image(image: AssetImage('assets/logo.png'))),
                   Container(
                     child: Text(
                       "  GUCircle",
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
                     ),
                   )
                 ],
@@ -44,8 +132,10 @@ class LoginScreen extends StatelessWidget {
                     controller: email,
                   ),
                   TextField(
-                      decoration: InputDecoration(labelText: 'Password'),
-                      controller: password),
+                    decoration: InputDecoration(labelText: 'Password'),
+                    controller: password,
+                    obscureText: true,
+                  ),
                 ],
               ),
               SizedBox(
@@ -58,7 +148,7 @@ class LoginScreen extends StatelessWidget {
                   //   style: TextStyle(color: Colors.blue),
                   // ),
                   ElevatedButton(
-                    onPressed: null,
+                    onPressed: login,
                     child: Text(
                       "Login",
                       style: TextStyle(color: Colors.white),

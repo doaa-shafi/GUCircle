@@ -2,6 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import './LoginScreen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class SignUpScreen extends StatefulWidget {
   @override
@@ -13,6 +16,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
   final username = TextEditingController();
 
+  final gucId = TextEditingController();
+
   final password = TextEditingController();
 
   final confimPassword = TextEditingController();
@@ -20,6 +25,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
   // final Future<FirebaseApp> _initialization = Firebase.initializeApp();
 
   FirebaseAuth get _auth => FirebaseAuth.instance;
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+  final usersRef = FirebaseFirestore.instance.collection('Users');
+  Future<bool> usernameExists(String username) async {
+    final result = await usersRef.where('username', isEqualTo: username).get();
+    return result.docs.isNotEmpty;
+  }
+
   @override
   // void initState() {
   //   super.initState();
@@ -46,7 +58,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
       if (email.text.trim().isEmpty ||
           username.text.trim().isEmpty ||
           password.text.trim().isEmpty ||
-          confimPassword.text.trim().isEmpty) {
+          confimPassword.text.trim().isEmpty ||
+          gucId.text.trim().isEmpty) {
         showDialog(
           context: context,
           builder: (BuildContext context) {
@@ -62,8 +75,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
             );
           },
         );
-      } else if (!email.text.trim().toLowerCase().endsWith("@guc.edu.eg") &&
-          !email.text.trim().toLowerCase().endsWith("@student.guc.edu.eg")) {
+      }
+      //else if (!email.text.trim().toLowerCase().endsWith("@guc.edu.eg") &&
+      //     !email.text.trim().toLowerCase().endsWith("@student.guc.edu.eg")) {
+      else if (!email.text.trim().toLowerCase().endsWith("")) {
         // Show an alert or handle the validation error as needed
         showDialog(
           context: context,
@@ -114,12 +129,74 @@ class _SignUpScreenState extends State<SignUpScreen> {
             );
           },
         );
+      } else if (await usernameExists(username.text)) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text('Validation Error'),
+              content: Text('username already exists'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
       } else {
-        FirebaseAuth.instance
-            .fetchSignInMethodsForEmail(email.text)
-            .then((signInMethods) async {
-          if (!signInMethods.isEmpty) {
-            // Email is  registered
+        try {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Signing up...'),
+                content: Text('Please wait...'),
+                actions: [],
+              );
+            },
+          );
+
+          await _auth.createUserWithEmailAndPassword(
+            email: email.text.trim(),
+            password: password.text.trim(),
+          );
+
+          // Send email verification
+          User? user = _auth.currentUser;
+          // ignore: deprecated_member_use
+          await user?.updateProfile(displayName: username.text);
+          await user?.sendEmailVerification();
+          Navigator.pop(context);
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Email Verification'),
+                content: Text(
+                    'A verification email has been sent to your email address. Please check your inbox and click the verification link in the email.'),
+                actions: [
+                  TextButton(
+                    onPressed: () =>
+                        Navigator.pushNamed(context, '/loginRoute'),
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
+          if (user != null) {
+            await firestore.collection('Users').doc(user.uid).set({
+              'uid': user.uid,
+              'username': username.text,
+              'email': email.text,
+              'gucId': gucId.text,
+            });
+          }
+        } catch (e) {
+          if (e is FirebaseAuthException && e.code == 'email-already-in-use') {
+            Navigator.pop(context);
             showDialog(
               context: context,
               builder: (BuildContext context) {
@@ -135,43 +212,28 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 );
               },
             );
+            // Handle the error accordingly
           } else {
-            // Email is not registered
-            try {
-              print('Email: ${email.text.trim()}');
-              await _auth.createUserWithEmailAndPassword(
-                email: email.text.trim(),
-                password: password.text.trim(),
-              );
-
-              // Send email verification
-              User? user = _auth.currentUser;
-              // ignore: deprecated_member_use
-              await user?.updateProfile(displayName: username.text);
-              await user?.sendEmailVerification();
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text('Email Verification'),
-                    content: Text(
-                        'A verification email has been sent to your email address. Please check your inbox and click the verification link in the email.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () =>
-                            Navigator.pushNamed(context, '/loginRoute'),
-                        child: Text('OK'),
-                      ),
-                    ],
-                  );
-                },
-              );
-            } catch (e) {
-              print('Error: $e');
-              // Handle authentication errors
-            }
+            print('Error: $e');
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Error'),
+                  content: Text('An error occurred.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+            // Handle other errors
           }
-        });
+        }
+        ;
       }
     }
 
@@ -209,6 +271,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   TextField(
                     decoration: InputDecoration(labelText: 'Username'),
                     controller: username,
+                  ),
+                  TextField(
+                    decoration: InputDecoration(labelText: 'GUC ID (xx-xxxxx)'),
+                    controller: gucId,
                   ),
                   TextField(
                     decoration: InputDecoration(labelText: 'Password'),
