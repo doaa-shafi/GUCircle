@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gucircle/classes/UserModel.dart';
 import 'package:gucircle/screens/ConfessionsScreen.dart';
 import 'package:gucircle/screens/ImportantNumbersScreen.dart';
 import 'package:gucircle/screens/LostAndFoundScreen.dart';
@@ -7,8 +8,11 @@ import 'package:gucircle/screens/SignUpScreen.dart';
 import 'package:gucircle/screens/TabControllerScreen.dart';
 import 'package:gucircle/screens/UploadLostAndFoundScreen.dart';
 import 'package:gucircle/screens/profileScreen.dart';
+import 'package:gucircle/screens/splashScreen.dart';
+import 'package:provider/provider.dart';
 import './screens/EventsScreen.dart';
 import './screens/LoginScreen.dart';
+import './screens/splashScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 
 void main() async {
@@ -19,7 +23,12 @@ void main() async {
     print('Error initializing Firebase here : $e');
   }
 
-  runApp(MyApp());
+   runApp(
+    ChangeNotifierProvider(
+      create: (context) => UserModel(),
+      child: MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -43,9 +52,9 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: primaryBlack,
         ),
-        initialRoute: '/loginRoute',
+        initialRoute: '/',
         routes: {
-          '/': (ctx) => TabsControllerScreen(),
+          '/': (ctx) => SplashScreen(),
           '/loginRoute': (ctx) => LoginScreen(),
           '/signupRoute': (ctx) => SignUpScreen(),
           '/importantNumbersRoute': (ctx) => ImportantNumbersScreen(),

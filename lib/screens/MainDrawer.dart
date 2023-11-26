@@ -1,5 +1,8 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:gucircle/classes/UserModel.dart';
+import 'package:provider/provider.dart';
 
 class MainDrawer extends StatelessWidget {
   @override
@@ -135,8 +138,21 @@ class MainDrawer extends StatelessWidget {
               ),
               title: const Text("Log out",
                   style: TextStyle(color: Colors.white, fontSize: 20)),
-              onTap: () {
-                Navigator.of(context).pushNamed('/');
+              onTap: () async {
+                showDialog(
+                  context: context,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: Text('Logging out...'),
+                      content: Text('Please wait...'),
+                      actions: [],
+                    );
+                  },
+                );
+                await FirebaseAuth.instance.signOut();
+                Provider.of<UserModel>(context, listen: false).clearUser();
+                Navigator.pop(context);
+                Navigator.of(context).pushNamed('/loginRoute');
               },
             ),
           ],

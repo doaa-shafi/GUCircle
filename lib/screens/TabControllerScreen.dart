@@ -201,7 +201,7 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
           const SizedBox(
             width: 10,
           ),
-          const Text("GUCircle")
+          const Text("GUCircle", style: TextStyle(color: Colors.white))
         ]),
         iconTheme:
             const IconThemeData(color: const Color.fromARGB(255, 255, 208, 59)),

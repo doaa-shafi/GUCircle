@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:gucircle/classes/UserModel.dart';
 import './SignUpScreen.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 
 class LoginScreen extends StatelessWidget {
   final email = TextEditingController();
@@ -36,7 +39,16 @@ class LoginScreen extends StatelessWidget {
         if (user != null) {
           if (user.emailVerified) {
             print('User signed in: ${user.uid}');
+            DocumentSnapshot doc = await FirebaseFirestore.instance
+                .collection('Users')
+                .doc(user.uid)
+                .get();
+            Map<String, dynamic> userDetails =
+                doc.data() as Map<String, dynamic>;
+            Provider.of<UserModel>(context, listen: false).setUser(userDetails);
             Navigator.of(context).pushReplacementNamed('/profileRoute');
+            // Navigator.of(context)
+            //     .pushReplacementNamed('/importantNumbersRoute');
           } else {
             Navigator.pop(context);
             showDialog(
