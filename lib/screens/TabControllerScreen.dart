@@ -1,5 +1,6 @@
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
+import 'package:gucircle/components/mainAppBar.dart';
 import 'package:gucircle/screens/AcademicQuestionsScreen.dart';
 import 'package:gucircle/screens/ConfessionsScreen.dart';
 import 'package:gucircle/screens/EventsScreen.dart';
@@ -195,17 +196,8 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(children: [
-          Image.asset('assets/logo.png', height: 40, width: 40),
-          const SizedBox(
-            width: 10,
-          ),
-          const Text("GUCircle", style: TextStyle(color: Colors.white))
-        ]),
-        iconTheme:
-            const IconThemeData(color: const Color.fromARGB(255, 255, 208, 59)),
-        backgroundColor: Colors.black,
+      appBar: MainAppBar(
+        appBar: AppBar(),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
