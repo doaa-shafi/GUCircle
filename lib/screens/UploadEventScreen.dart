@@ -1,26 +1,28 @@
-import 'dart:ffi';
 import 'dart:io';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 class UploadEventScreen extends StatefulWidget {
   const UploadEventScreen({super.key});
 
   @override
-  State<UploadEventScreen> createState() =>
-      _UploadLostAndFoundScreenState();
+  State<UploadEventScreen> createState() => _UploadLostAndFoundScreenState();
 }
 
-class _UploadLostAndFoundScreenState
-    extends State<UploadEventScreen> {
+class _UploadLostAndFoundScreenState extends State<UploadEventScreen> {
   File? selectedImage;
+  String imgUrl = "";
+  bool error = false;
+
   Future pickImageFromGalary() async {
     final returenedImage =
         await ImagePicker().pickImage(source: ImageSource.gallery);
     if (returenedImage == null) return;
     setState(() {
-      selectedImage = File(returenedImage!.path);
+      selectedImage = File(returenedImage.path);
     });
   }
 
@@ -29,7 +31,7 @@ class _UploadLostAndFoundScreenState
         await ImagePicker().pickImage(source: ImageSource.camera);
     if (returenedImage == null) return;
     setState(() {
-      selectedImage = File(returenedImage!.path);
+      selectedImage = File(returenedImage.path);
     });
   }
 
@@ -41,11 +43,35 @@ class _UploadLostAndFoundScreenState
           anonymous = !anonymous;
         })
       };
+
+  void removeImage() => setState(() {
+        selectedImage = null;
+      });
+
+  Future<void> request() async {
+    if (selectedImage != null) {
+      String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference referenceRoot = FirebaseStorage.instance.ref();
+      Reference referenceDirImages = referenceRoot.child('EventImgs');
+      Reference referenceImgToUpload = referenceDirImages.child(uniqueName);
+      try {
+        await referenceImgToUpload.putFile(selectedImage!);
+        imgUrl = await referenceImgToUpload
+            .getDownloadURL(); //get the image we uploaded
+        error = false;
+        print("Image uploaded successfully. Image URL: $imgUrl");
+      } catch (e) {
+        print("Error uploading image: $e");
+        error = true;
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Have a question..?'),
+        title: Text('Add Event'),
         backgroundColor: Colors.black,
       ),
       body: SingleChildScrollView(
@@ -70,15 +96,24 @@ class _UploadLostAndFoundScreenState
                           minLines: 1,
                           maxLines: 10,
                           decoration: InputDecoration(
-                              labelText: 'What is your question....',
+                              labelText: 'What is your event?',
                               border: InputBorder.none),
                           controller: lostItemDesc,
                         ),
                         SizedBox(
-                          height: 100,
+                          height: 20,
                         ),
                         selectedImage != null
-                            ? Image.file(selectedImage!)
+                            ? Column(
+                                children: [
+                                  Image.file(selectedImage!),
+                                  IconButton(
+                                    icon: const Icon(Icons.delete_outline),
+                                    color: Colors.red,
+                                    onPressed: removeImage,
+                                  )
+                                ],
+                              )
                             : Row(
                                 mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
@@ -96,156 +131,39 @@ class _UploadLostAndFoundScreenState
                                       )),
                                 ],
                               ),
-                        SizedBox(
-                          height: 20,
-                        ),
-                        Row(
-                          children: [
-                            GestureDetector(
-                              onTap: () => {
-                                setState(() {
-                                  category = "News";
-                                })
-                              },
-                              child: Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: category == "News"
-                                            ? Colors.white
-                                            : Color.fromARGB(255, 255, 208, 0)),
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    color: category == "News"
-                                        ? Color.fromARGB(255, 255, 230, 0)
-                                        : Colors.white),
-                                child: Text(
-                                  "News",
-                                  style: TextStyle(
-                                      color: category == "News"
-                                          ? Colors.white
-                                          : const Color.fromARGB(
-                                              255, 255, 208, 0),
-                                      fontWeight: category == "News"
-                                          ?FontWeight.bold
-                                          :FontWeight.w500),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            GestureDetector(
-                              onTap: () => {
-                                setState(() {
-                                  category = "Event";
-                                })
-                              },
-                              child: Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: category == "Event"
-                                            ? Colors.white
-                                            : Color.fromARGB(255, 255, 208, 0)),
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    color: category == "Event"
-                                        ? const Color.fromARGB(150, 255, 208, 0)
-                                        : Colors.white),
-                                child: Text(
-                                  "Event",
-                                  style: TextStyle(
-                                      color: category == "Event"
-                                          ? Colors.white
-                                          : const Color.fromARGB(
-                                              255, 255, 208, 0)),
-                                ),
-                              ),
-                            ),
-                            SizedBox(
-                              width: 10,
-                            ),
-                            GestureDetector(
-                              onTap: () => {
-                                setState(() {
-                                  category = "Club";
-                                })
-                              },
-                              child: Container(
-                                padding: EdgeInsets.all(10),
-                                decoration: BoxDecoration(
-                                    border: Border.all(
-                                        color: category == "Club"
-                                            ? Colors.white
-                                            : Color.fromARGB(255, 255, 208, 0)),
-                                    borderRadius: BorderRadius.circular(10.0),
-                                    color: category == "Club"
-                                        ? const Color.fromARGB(150, 255, 208, 0)
-                                        : Colors.white),
-                                child: Text(
-                                  "Club",
-                                  style: TextStyle(
-                                      color: category == "Club"
-                                          ? Colors.white
-                                          : const Color.fromARGB(
-                                              255, 255, 208, 0)),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 40,),
-                        GestureDetector(
-                          onTap: () => {changeAnonymous()},
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Container(
-                                child: anonymous
-                                    ? Image.asset(
-                                        "assets/silent.png",
-                                      )
-                                    : Image.asset(
-                                        "assets/silent1.png",
-                                      ),
-                                width: 30,
-                                height: 30,
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Container(
-                                  padding: EdgeInsets.fromLTRB(20, 6, 20, 6),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.grey),
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: anonymous
-                                      ? Text("anonymous")
-                                      : Text("post it anonymously?"))
-                            ],
-                          ),
-                        )
                       ],
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 10,),
+              SizedBox(
+                height: 10,
+              ),
               ElevatedButton(
-                onPressed: null,
-                child: Text(
-                  "Post",
-                  style: TextStyle(color: Colors.white),
-                ),
+                onPressed: request,
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.resolveWith((states) {
                     // If the button is pressed, return green, otherwise blue
                     if (states.contains(MaterialState.pressed)) {
-                      return Colors.red[500];
+                      return const Color.fromARGB(255, 190, 52, 42);
                     }
                     return Colors.red[500];
                   }),
                 ),
-              )
+                child: Text(
+                  "Request Approval",
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+              const SizedBox(
+                height: 10,
+              ),
+              error
+                  ? const Text(
+                      "An error occured, please try again later",
+                      style: TextStyle(color: Colors.red),
+                    )
+                  : const SizedBox()
             ],
           ),
         ),

@@ -46,7 +46,7 @@ class LoginScreen extends StatelessWidget {
             Map<String, dynamic> userDetails =
                 doc.data() as Map<String, dynamic>;
             Provider.of<UserModel>(context, listen: false).setUser(userDetails);
-            Navigator.of(context).pushReplacementNamed('/profileRoute');
+            Navigator.of(context).pushReplacementNamed('/mainPage');
           } else {
             Navigator.pop(context);
             showDialog(

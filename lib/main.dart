@@ -23,7 +23,7 @@ void main() async {
     print('Error initializing Firebase here : $e');
   }
 
-   runApp(
+  runApp(
     ChangeNotifierProvider(
       create: (context) => UserModel(),
       child: MyApp(),
@@ -64,6 +64,7 @@ class MyApp extends StatelessWidget {
           '/officesRoute': (ctx) => OfficesScreen(),
           '/eventsRoute': (ctx) => EventsScreen(),
           '/profileRoute': (ctx) => ProfileScreen(),
+          '/mainPage': (ctx) => TabsControllerScreen(),
         });
   }
 }
