@@ -2,15 +2,10 @@ import 'package:flutter/material.dart';
 
 class EventCard extends StatelessWidget {
   String username;
-  ImageProvider profPic;
   String text;
-  ImageProvider? attachedImg;
+  Image? attachedImg;
 
-  EventCard(
-      {required this.username,
-      this.attachedImg,
-      required this.profPic,
-      required this.text});
+  EventCard({required this.username, this.attachedImg, required this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -23,16 +18,20 @@ class EventCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              CircleAvatar(
-                child: Image(
-                  image: profPic,
+              ClipRRect(
+                borderRadius: BorderRadius.circular(50.0),
+                child: Image.asset(
+                  'assets/default-user.png',
+                  height: 50,
                 ),
-                backgroundColor: Colors.white,
               ),
-              Text(
-                username,
-                style: TextStyle(
-                  fontSize: 20,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(15.0, 0, 0, 0),
+                child: Text(
+                  username,
+                  style: TextStyle(
+                    fontSize: 20,
+                  ),
                 ),
               )
             ],
@@ -47,7 +46,7 @@ class EventCard extends StatelessWidget {
           const SizedBox(
             height: 30,
           ),
-          attachedImg != null ? Image(image: attachedImg!) : const SizedBox(),
+          attachedImg != null ? attachedImg! : const SizedBox(),
           Container(
             padding: EdgeInsets.all(6),
             decoration: BoxDecoration(color: Colors.grey[100]),
