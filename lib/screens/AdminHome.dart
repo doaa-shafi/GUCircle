@@ -10,7 +10,7 @@ class AdminHome extends StatelessWidget {
   //List<Event> eventsList = [];
 
   Future<QuerySnapshot> fetchEvents() async {
-    return collectionRef.where('pending', isEqualTo: false).get();
+    return collectionRef.where('pending', isEqualTo: true).get();
   }
 
   Future<String> getUsername(String userId) async {
