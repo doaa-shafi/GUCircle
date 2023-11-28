@@ -20,6 +20,12 @@ class TabsControllerScreen extends StatefulWidget {
 
 class _TabsControllerScreenState extends State<TabsControllerScreen> {
   int selectedItem = 0;
+  List<String> titles = [
+    "Confessions",
+    "Academic Questions",
+    "Lost and Found",
+    "Events"
+  ];
   static List<Widget> _widgetOptions = <Widget>[
     ConfessionsScreen(),
     AcademicQuestionsScreen(),
@@ -198,6 +204,7 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
     return Scaffold(
       appBar: MainAppBar(
         appBar: AppBar(),
+        title: titles[selectedItem],
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(

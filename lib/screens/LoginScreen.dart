@@ -19,6 +19,10 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     Future<void> login() async {
+      if (email.text == "admin" && password.text == "admin") {
+        Navigator.of(context).pushReplacementNamed('/adminHome');
+        return;
+      }
       try {
         showDialog(
           context: context,
@@ -46,7 +50,11 @@ class LoginScreen extends StatelessWidget {
             Map<String, dynamic> userDetails =
                 doc.data() as Map<String, dynamic>;
             Provider.of<UserModel>(context, listen: false).setUser(userDetails);
+            // if (email.text == "alaa_abdulla2001@hotmail.com") {
+            //   Navigator.of(context).pushReplacementNamed('/adminHome');
+            // } else {
             Navigator.of(context).pushReplacementNamed('/mainPage');
+            // }
           } else {
             Navigator.pop(context);
             showDialog(

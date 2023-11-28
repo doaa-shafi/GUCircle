@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   final AppBar appBar;
-  const MainAppBar({required this.appBar});
+  final String title;
+  const MainAppBar({required this.appBar, required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +13,7 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
           const SizedBox(
             width: 10,
           ),
-          const Text("GUCircle", style: TextStyle(color: Colors.white))
+          Text(title, style: TextStyle(color: Colors.white))
         ]),
         iconTheme: const IconThemeData(color: Color.fromARGB(255, 83, 69, 22)),
         backgroundColor: Colors.black,

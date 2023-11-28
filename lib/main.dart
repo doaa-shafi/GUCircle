@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gucircle/classes/UserModel.dart';
+import 'package:gucircle/screens/AdminHome.dart';
 import 'package:gucircle/screens/ConfessionsScreen.dart';
 import 'package:gucircle/screens/ImportantNumbersScreen.dart';
 import 'package:gucircle/screens/LostAndFoundScreen.dart';
@@ -65,6 +66,7 @@ class MyApp extends StatelessWidget {
           '/eventsRoute': (ctx) => EventsScreen(),
           '/profileRoute': (ctx) => ProfileScreen(),
           '/mainPage': (ctx) => TabsControllerScreen(),
+          '/adminHome': (ctx) => AdminHome(),
         });
   }
 }

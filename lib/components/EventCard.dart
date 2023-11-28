@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 
 class EventCard extends StatelessWidget {
-  String username;
-  String text;
-  Image? attachedImg;
+  final String username;
+  final String text;
+  final Image? attachedImg;
 
   EventCard({required this.username, this.attachedImg, required this.text});
 
