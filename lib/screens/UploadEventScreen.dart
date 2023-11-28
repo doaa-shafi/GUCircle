@@ -1,4 +1,6 @@
 import 'dart:io';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,10 @@ class _UploadLostAndFoundScreenState extends State<UploadEventScreen> {
   File? selectedImage;
   String imgUrl = "";
   bool error = false;
+  final CollectionReference _reference =
+      FirebaseFirestore.instance.collection('shopping_list');
+  final eventDesc = TextEditingController();
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Future pickImageFromGalary() async {
     final returenedImage =
@@ -35,20 +41,30 @@ class _UploadLostAndFoundScreenState extends State<UploadEventScreen> {
     });
   }
 
-  final lostItemDesc = TextEditingController();
-  String category = "";
-  bool anonymous = false;
-  changeAnonymous() => {
-        setState(() {
-          anonymous = !anonymous;
-        })
-      };
-
   void removeImage() => setState(() {
         selectedImage = null;
       });
 
   Future<void> request() async {
+    if (eventDesc.text.trim().isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Your event must have a description'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
     if (selectedImage != null) {
       String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
       Reference referenceRoot = FirebaseStorage.instance.ref();
@@ -64,6 +80,54 @@ class _UploadLostAndFoundScreenState extends State<UploadEventScreen> {
         print("Error uploading image: $e");
         error = true;
       }
+    }
+
+    try {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Sending Request...'),
+            content: Text('Please wait...'),
+            actions: [],
+          );
+        },
+      );
+      User? user = FirebaseAuth.instance.currentUser;
+      String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
+      if (user != null) {
+        await firestore.collection('Events').doc(user.uid + uniqueName).set({
+          'userId': user.uid,
+          'text': eventDesc.text,
+          'pending': true,
+          'imgURL': imgUrl,
+        });
+      }
+
+      Navigator.pop(context);
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Request Successful'),
+            content: Text('Your request was successfully sent.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Navigate back to the previous page
+                  Navigator.of(context)
+                      .popUntil((route) => route.settings.name == '/mainPage');
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      print("Error sending request: $e");
+      error = true;
     }
   }
 
@@ -98,7 +162,7 @@ class _UploadLostAndFoundScreenState extends State<UploadEventScreen> {
                           decoration: InputDecoration(
                               labelText: 'What is your event?',
                               border: InputBorder.none),
-                          controller: lostItemDesc,
+                          controller: eventDesc,
                         ),
                         SizedBox(
                           height: 20,
