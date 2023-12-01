@@ -74,7 +74,11 @@ class _AdminHomeState extends State<AdminHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MainAppBar(appBar: AppBar(), title: 'GUCircle - Admin'),
+      appBar: MainAppBar(
+        appBar: AppBar(),
+        title: 'GUCircle - Admin',
+        goBack: false,
+      ),
       body: RefreshIndicator(
         onRefresh: refreshData,
         child: FutureBuilder<QuerySnapshot>(
@@ -90,11 +94,16 @@ class _AdminHomeState extends State<AdminHome> {
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else if (snapshot.data!.docs.isEmpty) {
-              return const Center(
-                  child: Text(
-                'No more events',
-                style: TextStyle(fontSize: 20),
-              ));
+              return SingleChildScrollView(
+                child: Container(
+                  height: MediaQuery.of(context).size.height,
+                  child: const Center(
+                      child: Text(
+                    'No more events',
+                    style: TextStyle(fontSize: 20),
+                  )),
+                ),
+              );
             } else {
               return ListView(
                 children: snapshot.data!.docs.map((DocumentSnapshot eventDoc) {
