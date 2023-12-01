@@ -4,8 +4,12 @@ class EventCard extends StatelessWidget {
   final String username;
   final String text;
   final Image? attachedImg;
-
-  EventCard({required this.username, this.attachedImg, required this.text});
+  final String title;
+  EventCard(
+      {required this.username,
+      this.attachedImg,
+      required this.text,
+      required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -38,6 +42,10 @@ class EventCard extends StatelessWidget {
           ),
           const SizedBox(
             height: 30,
+          ),
+          Text(
+            title,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
           ),
           Text(
             text,

@@ -18,9 +18,8 @@ class _UploadLostAndFoundScreenState extends State<UploadEventScreen> {
   File? selectedImage;
   String imgUrl = "";
   bool error = false;
-  final CollectionReference _reference =
-      FirebaseFirestore.instance.collection('shopping_list');
   final eventDesc = TextEditingController();
+  final eventTitle = TextEditingController();
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Future pickImageFromGalary() async {
@@ -46,13 +45,13 @@ class _UploadLostAndFoundScreenState extends State<UploadEventScreen> {
       });
 
   Future<void> request() async {
-    if (eventDesc.text.trim().isEmpty) {
+    if (eventDesc.text.trim().isEmpty || eventTitle.text.trim().isEmpty) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Error'),
-            content: Text('Your event must have a description'),
+            content: Text('Your event must have a title and description'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -98,6 +97,7 @@ class _UploadLostAndFoundScreenState extends State<UploadEventScreen> {
       if (user != null) {
         await firestore.collection('Events').doc(user.uid + uniqueName).set({
           'userId': user.uid,
+          'Title': eventTitle.text,
           'text': eventDesc.text,
           'pending': true,
           'imgURL': imgUrl,
@@ -155,6 +155,12 @@ class _UploadLostAndFoundScreenState extends State<UploadEventScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        TextField(
+                          decoration: InputDecoration(
+                              labelText: 'Event Title',
+                              border: InputBorder.none),
+                          controller: eventTitle,
+                        ),
                         TextField(
                           keyboardType: TextInputType.multiline,
                           minLines: 1,
