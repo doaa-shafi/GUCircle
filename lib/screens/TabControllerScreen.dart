@@ -205,6 +205,7 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
       appBar: MainAppBar(
         appBar: AppBar(),
         title: titles[selectedItem],
+        goBack: false,
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(

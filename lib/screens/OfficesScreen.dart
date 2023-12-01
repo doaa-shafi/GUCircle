@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gucircle/components/mainAppBar.dart';
 import '../office.dart';
 
 class OfficesScreen extends StatefulWidget {
@@ -87,9 +88,7 @@ class _OfficesScreenState extends State<OfficesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Maps'),
-      ),
+      appBar: MainAppBar(appBar: AppBar(), goBack: true, title: 'Maps'),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(

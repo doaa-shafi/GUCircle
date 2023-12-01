@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:gucircle/components/mainAppBar.dart';
 import '../number.dart';
 
 class ImportantNumbersScreen extends StatefulWidget {
@@ -49,9 +50,8 @@ class _ImportantNumbersScreenState extends State<ImportantNumbersScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text("Important Numbers"),
-      ),
+      appBar: MainAppBar(
+          appBar: AppBar(), title: 'Important Numbers', goBack: true),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: Column(

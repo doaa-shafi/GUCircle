@@ -4,6 +4,7 @@ import 'package:gucircle/screens/AdminHome.dart';
 import 'package:gucircle/screens/ConfessionsScreen.dart';
 import 'package:gucircle/screens/ImportantNumbersScreen.dart';
 import 'package:gucircle/screens/LostAndFoundScreen.dart';
+import 'package:gucircle/screens/NotificationsScreen.dart';
 import 'package:gucircle/screens/OfficesScreen.dart';
 import 'package:gucircle/screens/SignUpScreen.dart';
 import 'package:gucircle/screens/TabControllerScreen.dart';
@@ -67,6 +68,7 @@ class MyApp extends StatelessWidget {
           '/profileRoute': (ctx) => ProfileScreen(),
           '/mainPage': (ctx) => TabsControllerScreen(),
           '/adminHome': (ctx) => AdminHome(),
+          '/notificationsRoute': (ctx) => NotificationsScreen()
         });
   }
 }

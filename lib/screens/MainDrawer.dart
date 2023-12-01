@@ -61,7 +61,7 @@ class MainDrawer extends StatelessWidget {
               title: const Text("Notifications",
                   style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
-                Navigator.of(context).pushNamed('/');
+                Navigator.of(context).pushNamed('/notificationsRoute');
               },
             ),
             ListTile(

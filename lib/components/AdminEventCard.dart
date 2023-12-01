@@ -4,9 +4,16 @@ class AdminEventCard extends StatelessWidget {
   final String username;
   final String text;
   final Image? attachedImg;
-
+  final String title;
+  final VoidCallback onApprove;
+  final VoidCallback onReject;
   AdminEventCard(
-      {required this.username, this.attachedImg, required this.text});
+      {required this.username,
+      this.attachedImg,
+      required this.text,
+      required this.onApprove,
+      required this.onReject,
+      required this.title});
 
   @override
   Widget build(BuildContext context) {
@@ -41,6 +48,10 @@ class AdminEventCard extends StatelessWidget {
             height: 30,
           ),
           Text(
+            title,
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          Text(
             text,
             style: TextStyle(fontSize: 18),
           ),
@@ -56,7 +67,7 @@ class AdminEventCard extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
               ElevatedButton(
-                onPressed: null,
+                onPressed: onApprove,
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.resolveWith((states) {
                     // If the button is pressed, return green, otherwise blue
@@ -72,7 +83,7 @@ class AdminEventCard extends StatelessWidget {
                 ),
               ),
               ElevatedButton(
-                onPressed: null,
+                onPressed: onReject,
                 style: ButtonStyle(
                   backgroundColor: MaterialStateProperty.resolveWith((states) {
                     // If the button is pressed, return green, otherwise blue
