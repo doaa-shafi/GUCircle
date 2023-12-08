@@ -3,6 +3,9 @@ import 'dart:io';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UploadLostAndFoundScreen extends StatefulWidget {
   const UploadLostAndFoundScreen({super.key});
@@ -12,9 +15,13 @@ class UploadLostAndFoundScreen extends StatefulWidget {
       _UploadLostAndFoundScreenState();
 }
 
-class _UploadLostAndFoundScreenState
-    extends State<UploadLostAndFoundScreen> {
+class _UploadLostAndFoundScreenState extends State<UploadLostAndFoundScreen> {
   File? selectedImage;
+  String imgUrl = "";
+  bool error = false;
+  final postDesc = TextEditingController();
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
   Future pickImageFromGalary() async {
     final returenedImage =
         await ImagePicker().pickImage(source: ImageSource.gallery);
@@ -33,14 +40,100 @@ class _UploadLostAndFoundScreenState
     });
   }
 
-  final lostItemDesc = TextEditingController();
-  String category = "";
-  bool anonymous = false;
-  changeAnonymous() => {
-        setState(() {
-          anonymous = !anonymous;
-        })
-      };
+  void removeImage() => setState(() {
+        selectedImage = null;
+      });
+
+  Future<void> request() async {
+    if (postDesc.text.trim().isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Please enter description'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    if (selectedImage != null) {
+      String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference referenceRoot = FirebaseStorage.instance.ref();
+      Reference referenceDirImages = referenceRoot.child('Imgs');
+      Reference referenceImgToUpload = referenceDirImages.child(uniqueName);
+      try {
+        await referenceImgToUpload.putFile(selectedImage!);
+        imgUrl = await referenceImgToUpload
+            .getDownloadURL(); //get the image we uploaded
+        error = false;
+        print("Image uploaded successfully. Image URL: $imgUrl");
+      } catch (e) {
+        print("Error uploading image: $e");
+        error = true;
+      }
+    }
+
+    try {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Sending Request...'),
+            content: Text('Please wait...'),
+            actions: [],
+          );
+        },
+      );
+      User? user = FirebaseAuth.instance.currentUser;
+      String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
+      if (user != null) {
+        await firestore
+            .collection('LostAndFound')
+            .doc(user.uid + uniqueName)
+            .set({
+          'userId': user.uid,
+          'text': postDesc.text,
+          'imgURL': imgUrl,
+          'likes': [],
+          'comments': [],
+        });
+      }
+
+      Navigator.pop(context);
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Request Successful'),
+            content: Text('Posted successfully.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Navigate back to the previous page
+                  Navigator.of(context)
+                      .popUntil((route) => route.settings.name == '/mainPage');
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      print("Error sending request: $e");
+      error = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -72,7 +165,7 @@ class _UploadLostAndFoundScreenState
                           decoration: InputDecoration(
                               labelText: 'What did you lose/find and where?',
                               border: InputBorder.none),
-                          controller: lostItemDesc,
+                          controller: postDesc,
                         ),
                         SizedBox(
                           height: 100,
@@ -96,59 +189,45 @@ class _UploadLostAndFoundScreenState
                                       )),
                                 ],
                               ),
-                        SizedBox(height: 40,),
-                        GestureDetector(
-                          onTap: () => {changeAnonymous()},
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Container(
-                                child: anonymous
-                                    ? Image.asset(
-                                        "assets/silent.png",
-                                      )
-                                    : Image.asset(
-                                        "assets/silent1.png",
-                                      ),
-                                width: 30,
-                                height: 30,
-                              ),
-                              SizedBox(
-                                width: 10,
-                              ),
-                              Container(
-                                  padding: EdgeInsets.fromLTRB(20, 6, 20, 6),
-                                  decoration: BoxDecoration(
-                                      border: Border.all(color: Colors.grey),
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: anonymous
-                                      ? Text("anonymous")
-                                      : Text("post it anonymously?"))
-                            ],
-                          ),
-                        )
+                        SizedBox(
+                          height: 40,
+                        ),
                       ],
                     ),
                   ),
                 ),
               ),
-              SizedBox(height: 10,),
-              ElevatedButton(
-                onPressed: null,
-                child: Text(
-                  "Post",
-                  style: TextStyle(color: Colors.white),
-                ),
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.resolveWith((states) {
-                    // If the button is pressed, return green, otherwise blue
-                    if (states.contains(MaterialState.pressed)) {
-                      return Colors.red[500];
-                    }
-                    return Colors.red[500];
-                  }),
-                ),
-              )
+              SizedBox(
+                height: 10,
+              ),
+              Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: request,
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.resolveWith((states) {
+                          if (states.contains(MaterialState.pressed)) {
+                            return Color.fromARGB(255, 107, 30, 24);
+                          }
+                          return const Color.fromARGB(255, 167, 46, 37);
+                        }),
+                      ),
+                      child: Text(
+                        "Post",
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              error
+                  ? const Text(
+                      "An error occured, please try again later",
+                      style: TextStyle(color: Colors.red),
+                    )
+                  : const SizedBox()
             ],
           ),
         ),
