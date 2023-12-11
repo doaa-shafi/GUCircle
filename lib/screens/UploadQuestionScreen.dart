@@ -7,15 +7,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class UploadLostAndFoundScreen extends StatefulWidget {
-  const UploadLostAndFoundScreen({super.key});
+class UploadQuestionScreen extends StatefulWidget {
+  const UploadQuestionScreen({super.key});
 
   @override
-  State<UploadLostAndFoundScreen> createState() =>
-      _UploadLostAndFoundScreenState();
+  State<UploadQuestionScreen> createState() => _UploadQuestionScreenState();
 }
 
-class _UploadLostAndFoundScreenState extends State<UploadLostAndFoundScreen> {
+class _UploadQuestionScreenState extends State<UploadQuestionScreen> {
   File? selectedImage;
   String imgUrl = "";
   bool error = false;
@@ -96,7 +95,7 @@ class _UploadLostAndFoundScreenState extends State<UploadLostAndFoundScreen> {
       String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
       if (user != null) {
         await firestore
-            .collection('LostAndFound')
+            .collection('AcademicQuestions')
             .doc(user.uid + uniqueName)
             .set({
           'userId': user.uid,
@@ -164,7 +163,7 @@ class _UploadLostAndFoundScreenState extends State<UploadLostAndFoundScreen> {
                           minLines: 1,
                           maxLines: 10,
                           decoration: InputDecoration(
-                              labelText: 'What did you lose/find and where?',
+                              labelText: 'Ask about Courses, Drs,...',
                               border: InputBorder.none),
                           controller: postDesc,
                         ),

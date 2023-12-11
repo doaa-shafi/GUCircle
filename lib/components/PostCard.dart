@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 class PostCard extends StatefulWidget {
   final String username;
   final String text;
+  final String collection;
   final Image? attachedImg;
   final List<dynamic> likes;
   final List<dynamic>? comments;
@@ -14,6 +15,7 @@ class PostCard extends StatefulWidget {
   PostCard({
     required this.username,
     this.attachedImg,
+    required this.collection,
     required this.text,
     required this.likes,
     required this.comments,
@@ -30,12 +32,18 @@ class _PostCardState extends State<PostCard> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Future<void> request() async {
+    print("LIKEEEEEEE");
+    print(widget.collection);
+    print(widget.postId);
     try {
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
         if (widget.likes.contains(user.uid)) {
           //already liked so unlike
-          await firestore.collection('LostAndFound').doc(widget.postId).update({
+          await firestore
+              .collection(widget.collection)
+              .doc(widget.postId)
+              .update({
             "likes": FieldValue.arrayRemove([user.uid])
           });
           setState(() {
@@ -43,7 +51,10 @@ class _PostCardState extends State<PostCard> {
           });
         } else {
           //like
-          await firestore.collection('LostAndFound').doc(widget.postId).update({
+          await firestore
+              .collection(widget.collection)
+              .doc(widget.postId)
+              .update({
             "likes": FieldValue.arrayUnion([user.uid])
           });
           setState(() {
@@ -52,7 +63,7 @@ class _PostCardState extends State<PostCard> {
         }
       }
     } catch (e) {
-      print("Error sending request: $e");
+      print("Error trying to like post");
       setState(() {
         error = true;
       });

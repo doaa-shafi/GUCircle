@@ -123,7 +123,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
                         heightFactor: 1.0,
                         alignment: Alignment.center,
                         child: Text(
-                          'No Reviews',
+                          'No Comments',
                           style: TextStyle(fontSize: 20),
                         )),
                   ),

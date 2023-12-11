@@ -1,7 +1,10 @@
+import 'dart:async';
+
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gucircle/components/MainAppBar.dart';
 import 'package:gucircle/post.dart';
-import 'package:gucircle/screens/CommentsScreen.dart';
+import 'package:gucircle/screens/LoastAndFoundCommentsScreen.dart';
 import 'package:gucircle/screens/RatingsCommentsScreen.dart';
 import 'package:gucircle/screens/UploadRatingScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -43,10 +46,39 @@ class RatingsScreen extends StatefulWidget {
 }
 
 class _RatingsScreenState extends State<RatingsScreen> {
+  late Timer _timer;
+  int _elapsedSeconds = 0;
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
   @override
   void initState() {
     super.initState();
     refreshData();
+    // start timer
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
+      _elapsedSeconds++;
+    });
+  }
+
+  @override
+  void dispose() {
+    saveElapsedTimeToDatabase();
+    _timer.cancel();
+    super.dispose();
+  }
+
+  Future<void> saveElapsedTimeToDatabase() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await firestore.collection('PagesScrolls').doc().set({
+          'page': 'Ratings',
+          'time': _elapsedSeconds,
+          'user': user.uid,
+        });
+      }
+    } catch (e) {
+      print("Error saving lost&found scroll time");
+    }
   }
 
   String searchQuery = '';
@@ -58,7 +90,8 @@ class _RatingsScreenState extends State<RatingsScreen> {
 
   Future<QuerySnapshot> fetchData() async {
     print('fetching data');
-    QuerySnapshot snapshot = await collectionRef.get();
+    QuerySnapshot snapshot =
+        await collectionRef.orderBy('date', descending: true).get();
     ratings = [];
     snapshot.docs.forEach((document) {
       Map<String, dynamic> postData = document.data() as Map<String, dynamic>;

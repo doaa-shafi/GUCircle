@@ -103,6 +103,7 @@ class _UploadRatingScreenState extends State<UploadRatingScreen> {
           'imgURL': imgUrl,
           'likes': [],
           'comments': [],
+          'date': DateTime.now()
         });
       }
 
