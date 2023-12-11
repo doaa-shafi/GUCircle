@@ -87,7 +87,7 @@ class MainDrawer extends StatelessWidget {
               title: const Text("Ratings",
                   style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
-                Navigator.of(context).pushNamed('/');
+                Navigator.of(context).pushNamed('/ratingsRoute');
               },
             ),
             ListTile(

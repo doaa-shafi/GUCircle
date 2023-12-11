@@ -145,7 +145,7 @@ class _LostAndFoundScreenState extends State<LostAndFoundScreen> {
                                           username:
                                               usernameSnapshot.data.toString(),
                                           text: postData['text'],
-                                          likes: postData['likes'].length,
+                                          likes: postData['likes'],
                                           comments: postData['comments'],
                                           attachedImg: postData['imgURL'] != ""
                                               ? Image.network(

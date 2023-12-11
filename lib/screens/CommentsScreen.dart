@@ -69,7 +69,6 @@ class _CommentsScreenState extends State<CommentsScreen> {
         },
       );
       User? user = FirebaseAuth.instance.currentUser;
-      String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
       if (user != null) {
         await firestore.collection('LostAndFound').doc(widget.postId).update({
           "comments": FieldValue.arrayUnion([
@@ -83,25 +82,6 @@ class _CommentsScreenState extends State<CommentsScreen> {
       });
 
       Navigator.pop(context);
-
-      showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Text('Request Successful'),
-            content: Text('Posted successfully.'),
-            actions: [
-              TextButton(
-                onPressed: () {
-                  // Navigate back to the previous page
-                  Navigator.of(context).pop();
-                },
-                child: Text('OK'),
-              ),
-            ],
-          );
-        },
-      );
     } catch (e) {
       print("Error sending request: $e");
       error = true;
@@ -115,89 +95,86 @@ class _CommentsScreenState extends State<CommentsScreen> {
         title: Text('Comments'),
         backgroundColor: Colors.black,
       ),
-      body: SingleChildScrollView(
-        child: Container(
-          padding: EdgeInsets.all(10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              widget.comments.isNotEmpty
-                  ? SizedBox(
-                      height: 650,
-                      child: ListView.builder(
-                        itemCount: widget.comments.length,
-                        itemBuilder: (context, index) {
-                          return FutureBuilder<String>(
-                            future: getUsername(widget.comments[index]['user']),
-                            builder: (context, usernameSnapshot) {
-                              return CommentCard(
-                                text: widget.comments[index]['text'],
-                                username: usernameSnapshot.data.toString(),
-                              );
-                            },
-                          );
-                        },
-                      ),
-                    )
-                  : Container(
-                      child: Align(
-                          heightFactor: 1.0,
-                          alignment: Alignment.center,
-                          child: Text(
-                            'No Comments',
-                            style: TextStyle(fontSize: 20),
-                          )),
+      body: Container(
+        padding: EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            widget.comments.isNotEmpty
+                ? Expanded(
+                    child: ListView.builder(
+                      itemCount: widget.comments.length,
+                      itemBuilder: (context, index) {
+                        return FutureBuilder<String>(
+                          future: getUsername(widget.comments[index]['user']),
+                          builder: (context, usernameSnapshot) {
+                            return CommentCard(
+                              text: widget.comments[index]['text'],
+                              username: usernameSnapshot.data.toString(),
+                            );
+                          },
+                        );
+                      },
                     ),
-              Row(
-                children: [
-                  Expanded(
-                    child: Card(
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                        //set border radius more than 50% of height and width to make circle
-                      ),
-                      child: Container(
-                        padding: EdgeInsets.all(5),
-                        child: TextField(
-                          keyboardType: TextInputType.multiline,
-                          minLines: 1,
-                          maxLines: 10,
-                          decoration: InputDecoration(
-                              labelText: 'Comment...',
-                              border: InputBorder.none),
-                          controller: newComment,
-                        ),
+                  )
+                : SizedBox(
+                    height: 650,
+                    child: Align(
+                        heightFactor: 1.0,
+                        alignment: Alignment.center,
+                        child: Text(
+                          'No Reviews',
+                          style: TextStyle(fontSize: 20),
+                        )),
+                  ),
+            Row(
+              children: [
+                Expanded(
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                      //set border radius more than 50% of height and width to make circle
+                    ),
+                    child: Container(
+                      padding: EdgeInsets.all(5),
+                      child: TextField(
+                        keyboardType: TextInputType.multiline,
+                        minLines: 1,
+                        maxLines: 10,
+                        decoration: InputDecoration(
+                            labelText: 'Comment...', border: InputBorder.none),
+                        controller: newComment,
                       ),
                     ),
                   ),
-                  ElevatedButton(
-                    onPressed: request,
-                    style: ButtonStyle(
-                      padding: MaterialStateProperty.all<EdgeInsets>(
-                          EdgeInsets.fromLTRB(0, 25, 0, 25)),
-                      backgroundColor:
-                          MaterialStateProperty.resolveWith((states) {
-                        if (states.contains(MaterialState.pressed)) {
-                          return Color.fromARGB(255, 107, 30, 24);
-                        }
-                        return const Color.fromARGB(255, 167, 46, 37);
-                      }),
-                    ),
-                    child: Text(
-                      "Post",
-                      style: TextStyle(color: Colors.white),
-                    ),
+                ),
+                ElevatedButton(
+                  onPressed: request,
+                  style: ButtonStyle(
+                    padding: MaterialStateProperty.all<EdgeInsets>(
+                        EdgeInsets.fromLTRB(0, 25, 0, 25)),
+                    backgroundColor:
+                        MaterialStateProperty.resolveWith((states) {
+                      if (states.contains(MaterialState.pressed)) {
+                        return Color.fromARGB(255, 107, 30, 24);
+                      }
+                      return const Color.fromARGB(255, 167, 46, 37);
+                    }),
                   ),
-                ],
-              ),
-              error
-                  ? const Text(
-                      "An error occured, please try again later",
-                      style: TextStyle(color: Colors.red),
-                    )
-                  : const SizedBox()
-            ],
-          ),
+                  child: Text(
+                    "Post",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+            error
+                ? const Text(
+                    "An error occured, please try again later",
+                    style: TextStyle(color: Colors.red),
+                  )
+                : const SizedBox()
+          ],
         ),
       ),
     );
