@@ -46,7 +46,7 @@ class _LostAndFoundScreenState extends State<LostAndFoundScreen> {
         });
       }
     } catch (e) {
-      print("Error saving lost&found scroll time");
+      print("Error saving scroll time");
     }
   }
 

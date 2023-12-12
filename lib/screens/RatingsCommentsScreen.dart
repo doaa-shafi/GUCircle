@@ -125,8 +125,8 @@ class _RatingsCommentsScreenState extends State<RatingsCommentsScreen> {
                     },
                   ),
                 )
-              : SizedBox(
-                  height: 600,
+              : Expanded(
+                  // height: 600,
                   child: Align(
                       heightFactor: 1.0,
                       alignment: Alignment.center,

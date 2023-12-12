@@ -77,7 +77,7 @@ class _RatingsScreenState extends State<RatingsScreen> {
         });
       }
     } catch (e) {
-      print("Error saving lost&found scroll time");
+      print("Error saving scroll time");
     }
   }
 
@@ -90,8 +90,8 @@ class _RatingsScreenState extends State<RatingsScreen> {
 
   Future<QuerySnapshot> fetchData() async {
     print('fetching data');
-    QuerySnapshot snapshot =
-        await collectionRef.orderBy('date', descending: true).get();
+    QuerySnapshot snapshot = await collectionRef.get();
+    print(snapshot.docs);
     ratings = [];
     snapshot.docs.forEach((document) {
       Map<String, dynamic> postData = document.data() as Map<String, dynamic>;
@@ -151,60 +151,64 @@ class _RatingsScreenState extends State<RatingsScreen> {
         appBar: MainAppBar(
           appBar: AppBar(),
           title: "Ratings",
-          goBack: false,
+          goBack: true,
         ),
-        body: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
-          RatingsSearchBar(
-            onSearch: filterRatings,
-          ),
-          RefreshIndicator(
-            onRefresh: refreshData,
-            child: FutureBuilder<QuerySnapshot>(
-              future: fetchData(),
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(
-                      color: Colors.amber,
-                      backgroundColor: Colors.grey,
-                    ),
-                  );
-                } else if (snapshot.hasError) {
-                  return Text('Error: ${snapshot.error}');
-                } else {
-                  return ratings.isNotEmpty
-                      ? ListView.builder(
-                          scrollDirection: Axis.vertical,
-                          shrinkWrap: true,
-                          key:
-                              UniqueKey(), // Add a UniqueKey to avoid rebuilding the list
-                          itemCount: ratings.length,
-                          itemBuilder: (context, index) {
-                            final rating = ratings[index];
-                            return Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: RatingCard(
-                                  postId: rating['id'],
-                                  // eventDoc.reference.id.toString(),
-                                  gotoComments: gotoComments,
-                                  username: rating['ratedEntity'],
-                                  comments: rating['ratings'],
-                                  // usernameSnapshot.data.toString(),
-                                  rating: rating['avgRating'],
-                                  // comments: postData['ratings'],
+        body: Column(
+            // crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              RatingsSearchBar(
+                onSearch: filterRatings,
+              ),
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: refreshData,
+                  child: FutureBuilder<QuerySnapshot>(
+                    future: fetchData(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(
+                            color: Colors.amber,
+                            backgroundColor: Colors.grey,
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        return ratings.isNotEmpty
+                            ? ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                shrinkWrap: true,
+                                key:
+                                    UniqueKey(), // Add a UniqueKey to avoid rebuilding the list
+                                itemCount: ratings.length,
+                                itemBuilder: (context, index) {
+                                  final rating = ratings[index];
+                                  return Padding(
+                                      padding: const EdgeInsets.all(10.0),
+                                      child: RatingCard(
+                                        postId: rating['id'],
+                                        // eventDoc.reference.id.toString(),
+                                        gotoComments: gotoComments,
+                                        username: rating['ratedEntity'],
+                                        comments: rating['ratings'],
+                                        // usernameSnapshot.data.toString(),
+                                        rating: rating['avgRating'],
+                                        // comments: postData['ratings'],
+                                      ));
+                                })
+                            : Align(
+                                heightFactor: 1.0,
+                                alignment: Alignment.center,
+                                child: Text(
+                                  'No Posts',
+                                  style: TextStyle(fontSize: 20),
                                 ));
-                          })
-                      : Align(
-                          heightFactor: 1.0,
-                          alignment: Alignment.center,
-                          child: Text(
-                            'No Posts',
-                            style: TextStyle(fontSize: 20),
-                          ));
-                }
-              },
-            ),
-          ),
-        ]));
+                      }
+                    },
+                  ),
+                ),
+              )
+            ]));
   }
 }

@@ -47,7 +47,7 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
         });
       }
     } catch (e) {
-      print("Error saving lost&found scroll time");
+      print("Error saving scroll time");
     }
   }
 
