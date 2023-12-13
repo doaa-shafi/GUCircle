@@ -1,31 +1,139 @@
 import 'dart:ffi';
 import 'dart:io';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:gucircle/components/ConfessionCard.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class UploadConfessionScreen extends StatefulWidget {
   const UploadConfessionScreen({super.key});
 
   @override
-  State<UploadConfessionScreen> createState() =>
-      _UploadLostAndFoundScreenState();
+  State<UploadConfessionScreen> createState() => _UploadConfessionScreenState();
 }
 
-class _UploadLostAndFoundScreenState extends State<UploadConfessionScreen> {
-  File? selectedImage;
-  final lostItemDesc = TextEditingController();
+class _UploadConfessionScreenState extends State<UploadConfessionScreen> {
+  final ConfessionText = TextEditingController();
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
   bool anonymous = false;
+  bool error = false;
   changeAnonymous() => {
         setState(() {
           anonymous = !anonymous;
         })
       };
+
+  Future<void> post() async {
+    if (ConfessionText.text.trim().isEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Error'),
+            content: Text('Cannot upload an empty confession'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+      return;
+    }
+
+    try {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Sending Request...'),
+            content: Text('Please wait...'),
+            actions: [],
+          );
+        },
+      );
+      User? user = FirebaseAuth.instance.currentUser;
+      String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
+      if (user != null) {
+        if (anonymous == false) {
+          DocumentReference docRef =
+              await firestore.collection('Confessions').add({
+            'user': user.uid,
+            'text': ConfessionText.text,
+            'likes': 0,
+            'comments': 0,
+            'timestamp': Timestamp.now(),
+          });
+          await firestore.collection('Notifications').doc("all").update({
+            'notifications': FieldValue.arrayUnion([
+              {
+                'message': "New confession posted",
+                'reference': docRef,
+                "timestamp": Timestamp.now(),
+              }
+            ]),
+          });
+        } else {
+          DocumentReference docRef =
+              await firestore.collection('Confessions').add({
+            'user': "Anonymous",    
+            'text': ConfessionText.text,
+            'likes': 0,
+            'comments': 0,
+            'timestamp': Timestamp.now(),
+          });
+          await firestore.collection('Notifications').doc("all").update({
+            'notifications': FieldValue.arrayUnion([
+              {
+                'message': "New confession posted",
+                'reference': docRef,
+                "timestamp": Timestamp.now(),
+              }
+            ]),
+          });
+        }
+      }
+
+      Navigator.pop(context);
+
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Uploaded Successful'),
+            content: Text('Your confession is successfully uploaded.'),
+            actions: [
+              TextButton(
+                onPressed: () {
+                  // Navigate back to the previous page
+                  Navigator.of(context)
+                      .popUntil((route) => route.settings.name == '/mainPage');
+                },
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    } catch (e) {
+      print("Error sending request: $e");
+      error = true;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Add confession')
-      ,backgroundColor: Colors.black,),
+      appBar: AppBar(
+        title: Text('Add confession'),
+        backgroundColor: Colors.black,
+      ),
       body: SingleChildScrollView(
         child: Container(
           padding: EdgeInsets.all(10),
@@ -45,14 +153,16 @@ class _UploadLostAndFoundScreenState extends State<UploadConfessionScreen> {
                       children: [
                         TextField(
                           keyboardType: TextInputType.multiline,
-                          minLines: 1, 
+                          minLines: 1,
                           maxLines: 10,
                           decoration: InputDecoration(
                               labelText: 'What is your confession....',
                               border: InputBorder.none),
-                          controller: lostItemDesc,
+                          controller: ConfessionText,
                         ),
-                        SizedBox(height: 200,),
+                        SizedBox(
+                          height: 200,
+                        ),
                         GestureDetector(
                           onTap: () => {changeAnonymous()},
                           child: Row(
@@ -77,7 +187,9 @@ class _UploadLostAndFoundScreenState extends State<UploadConfessionScreen> {
                                   decoration: BoxDecoration(
                                       border: Border.all(color: Colors.grey),
                                       borderRadius: BorderRadius.circular(10)),
-                                  child: anonymous?Text("anonymous"):Text("post it anonymously?"))
+                                  child: anonymous
+                                      ? Text("anonymous")
+                                      : Text("post it anonymously?"))
                             ],
                           ),
                         )
@@ -90,7 +202,7 @@ class _UploadLostAndFoundScreenState extends State<UploadConfessionScreen> {
                 height: 20,
               ),
               ElevatedButton(
-                onPressed: null,
+                onPressed: post,
                 child: Text(
                   "Post",
                   style: TextStyle(color: Colors.white),
