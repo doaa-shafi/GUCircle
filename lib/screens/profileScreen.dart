@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gucircle/User.dart';
 import 'package:gucircle/classes/UserModel.dart';
 import 'package:provider/provider.dart';
 
