@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
@@ -5,6 +6,35 @@ import 'package:gucircle/classes/UserModel.dart';
 import 'package:provider/provider.dart';
 
 class MainDrawer extends StatelessWidget {
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  Future<void> saveButtonClickToDatabase(String buttonName) async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        try {
+          await firestore
+              .collection('ButtonsClicks')
+              .doc(user.uid + buttonName)
+              .update({
+            'count': FieldValue.increment(1),
+          });
+        } catch (e) {
+          await firestore
+              .collection('ButtonsClicks')
+              .doc(user.uid + buttonName)
+              .set({
+            'button': buttonName,
+            'user': user.uid,
+            'count': 1,
+          });
+        }
+      }
+    } catch (e) {
+      print("Error saving button click");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -62,6 +92,7 @@ class MainDrawer extends StatelessWidget {
                   style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
                 Navigator.of(context).pushNamed('/notificationsRoute');
+                saveButtonClickToDatabase('Notifications');
               },
             ),
             ListTile(
@@ -75,6 +106,7 @@ class MainDrawer extends StatelessWidget {
                   style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
                 Navigator.of(context).pushNamed('/');
+                saveButtonClickToDatabase('EditProfile');
               },
             ),
             ListTile(
@@ -87,7 +119,8 @@ class MainDrawer extends StatelessWidget {
               title: const Text("Ratings",
                   style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
-                Navigator.of(context).pushNamed('/');
+                Navigator.of(context).pushNamed('/ratingsRoute');
+                saveButtonClickToDatabase('Ratings');
               },
             ),
             ListTile(
@@ -101,6 +134,7 @@ class MainDrawer extends StatelessWidget {
                   style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
                 Navigator.of(context).pushNamed('/importantNumbersRoute');
+                saveButtonClickToDatabase('ImportantNumbers');
               },
             ),
             ListTile(
@@ -114,6 +148,7 @@ class MainDrawer extends StatelessWidget {
                   style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
                 Navigator.of(context).pushNamed('/officesRoute');
+                saveButtonClickToDatabase('Maps');
               },
             ),
             ListTile(
@@ -127,6 +162,7 @@ class MainDrawer extends StatelessWidget {
                   style: TextStyle(color: Colors.white, fontSize: 20)),
               onTap: () {
                 Navigator.of(context).pushNamed('/settingsRoute');
+                saveButtonClickToDatabase('Settings');
               },
             ),
             ListTile(

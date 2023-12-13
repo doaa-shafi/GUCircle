@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gucircle/components/mainAppBar.dart';
 import '../office.dart';
@@ -8,6 +12,42 @@ class OfficesScreen extends StatefulWidget {
 }
 
 class _OfficesScreenState extends State<OfficesScreen> {
+  late Timer _timer;
+  int _elapsedSeconds = 0;
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    filteredOffices.addAll(offices);
+    // start timer
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
+      _elapsedSeconds++;
+    });
+  }
+
+  @override
+  void dispose() {
+    saveElapsedTimeToDatabase();
+    _timer.cancel();
+    super.dispose();
+  }
+
+  Future<void> saveElapsedTimeToDatabase() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await firestore.collection('PagesScrolls').doc().set({
+          'page': 'Offices',
+          'time': _elapsedSeconds,
+          'user': user.uid,
+        });
+      }
+    } catch (e) {
+      print("Error saving scroll time");
+    }
+  }
+
   List<Office> offices = [
     Office(
         id: "0",
@@ -61,12 +101,6 @@ class _OfficesScreenState extends State<OfficesScreen> {
   List<Office> filteredOffices = [];
   TextEditingController searchController =
       TextEditingController(); // Controller for the search bar
-
-  @override
-  void initState() {
-    super.initState();
-    filteredOffices.addAll(offices);
-  }
 
   void search(String query) {
     setState(() {

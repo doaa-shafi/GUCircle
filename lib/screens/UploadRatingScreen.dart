@@ -7,15 +7,14 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class UploadLostAndFoundScreen extends StatefulWidget {
-  const UploadLostAndFoundScreen({super.key});
+class UploadRatingScreen extends StatefulWidget {
+  const UploadRatingScreen({super.key});
 
   @override
-  State<UploadLostAndFoundScreen> createState() =>
-      _UploadLostAndFoundScreenState();
+  State<UploadRatingScreen> createState() => _UploadRatingScreenState();
 }
 
-class _UploadLostAndFoundScreenState extends State<UploadLostAndFoundScreen> {
+class _UploadRatingScreenState extends State<UploadRatingScreen> {
   File? selectedImage;
   String imgUrl = "";
   bool error = false;

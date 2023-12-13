@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:gucircle/components/mainAppBar.dart';
@@ -8,10 +10,12 @@ import 'package:gucircle/screens/ImportantNumbersScreen.dart';
 import 'package:gucircle/screens/LostAndFoundScreen.dart';
 import 'package:gucircle/screens/MainDrawer.dart';
 import 'package:gucircle/screens/OfficesScreen.dart';
+import 'package:gucircle/screens/QuestionsScreen.dart';
 import 'package:gucircle/screens/UploadAcademicQuestionScreen.dart';
 import 'package:gucircle/screens/UploadConfessionScreen.dart';
 import 'package:gucircle/screens/UploadEventScreen.dart';
 import 'package:gucircle/screens/UploadLostAndFoundScreen.dart';
+import 'package:gucircle/screens/UploadQuestionScreen.dart';
 
 class TabsControllerScreen extends StatefulWidget {
   @override
@@ -19,6 +23,36 @@ class TabsControllerScreen extends StatefulWidget {
 }
 
 class _TabsControllerScreenState extends State<TabsControllerScreen> {
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  Future<void> saveButtonClickToDatabase(String buttonName) async {
+    print(buttonName);
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        try {
+          await firestore
+              .collection('ButtonsClicks')
+              .doc(user.uid + buttonName)
+              .update({
+            'count': FieldValue.increment(1),
+          });
+        } catch (e) {
+          await firestore
+              .collection('ButtonsClicks')
+              .doc(user.uid + buttonName)
+              .set({
+            'button': buttonName,
+            'user': user.uid,
+            'count': 1,
+          });
+        }
+      }
+    } catch (e) {
+      print("Error saving button click");
+    }
+  }
+
   int selectedItem = 0;
   List<String> titles = [
     "Confessions",
@@ -26,9 +60,15 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
     "Lost and Found",
     "Events"
   ];
+  List<String> buttonNames = [
+    "Confessions",
+    "AcademicQuestions",
+    "LostAndFound",
+    "Events"
+  ];
   static List<Widget> _widgetOptions = <Widget>[
     ConfessionsScreen(),
-    AcademicQuestionsScreen(),
+    QuestionsScreen(),
     LostAndFoundScreen(),
     EventsScreen(),
   ];
@@ -40,7 +80,7 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
 
   gotoUploadAcademicQuestion(BuildContext myContext) {
     Navigator.of(myContext).push(MaterialPageRoute(builder: (ctxDummy) {
-      return UploadAcademicQuestionScreen();
+      return UploadQuestionScreen();
     }));
   }
 
@@ -86,7 +126,10 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
                           crossAxisSpacing: 10,
                           children: [
                             GestureDetector(
-                              onTap: () => {goToUploadConfession(context)},
+                              onTap: () {
+                                saveButtonClickToDatabase('UploadConfession');
+                                goToUploadConfession(context);
+                              },
                               child: Column(
                                 children: [
                                   Container(
@@ -107,7 +150,11 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () => gotoUploadAcademicQuestion(context),
+                              onTap: () {
+                                saveButtonClickToDatabase(
+                                    'UploadAcademicQuestion');
+                                gotoUploadAcademicQuestion(context);
+                              },
                               child: Column(
                                 children: [
                                   Container(
@@ -131,7 +178,10 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () => goToUploadLostAndFound(context),
+                              onTap: () {
+                                saveButtonClickToDatabase('UploadLostAndFound');
+                                goToUploadLostAndFound(context);
+                              },
                               child: Column(
                                 children: [
                                   Container(
@@ -152,7 +202,10 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
                               ),
                             ),
                             GestureDetector(
-                              onTap: () => goToUploadEvent(context),
+                              onTap: () {
+                                saveButtonClickToDatabase('UploadEvent');
+                                goToUploadEvent(context);
+                              },
                               child: Column(
                                 children: [
                                   Container(
@@ -172,27 +225,30 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
                                 ],
                               ),
                             ),
-                            GestureDetector(
-                              onTap: () => goToUploadRating(context),
-                              child: Column(
-                                children: [
-                                  Container(
-                                    padding: EdgeInsets.all(20),
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.circular(10.0),
-                                      color: Color.fromARGB(50, 255, 252, 64),
-                                    ),
-                                    child: Image.asset(
-                                      "assets/star.png",
-                                      width: 40,
-                                      height: 40,
-                                      color: Color.fromARGB(255, 255, 252, 64),
-                                    ),
-                                  ),
-                                  Text('Rating')
-                                ],
-                              ),
-                            )
+                            // GestureDetector(
+                            //   onTap: () {
+                            //     saveButtonClickToDatabase('UploadRating');
+                            //     goToUploadRating(context);
+                            //   },
+                            //   child: Column(
+                            //     children: [
+                            //       Container(
+                            //         padding: EdgeInsets.all(20),
+                            //         decoration: BoxDecoration(
+                            //           borderRadius: BorderRadius.circular(10.0),
+                            //           color: Color.fromARGB(50, 255, 252, 64),
+                            //         ),
+                            //         child: Image.asset(
+                            //           "assets/star.png",
+                            //           width: 40,
+                            //           height: 40,
+                            //           color: Color.fromARGB(255, 255, 252, 64),
+                            //         ),
+                            //       ),
+                            //       Text('Rating')
+                            //     ],
+                            //   ),
+                            // )
                           ]),
                     ),
                   ]));
@@ -209,7 +265,10 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: FloatingActionButton(
-        onPressed: () => showAddSheet(context),
+        onPressed: () {
+          saveButtonClickToDatabase('MainAddButton');
+          showAddSheet(context);
+        },
         child: Image.asset(
           "assets/add.png",
         ),
@@ -218,6 +277,7 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
       bottomNavigationBar: BottomNavigationBar(
           onTap: (int index) {
             setState(() {
+              saveButtonClickToDatabase(buttonNames[index]);
               selectedItem = index;
             });
           },

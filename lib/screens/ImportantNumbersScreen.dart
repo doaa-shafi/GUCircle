@@ -1,3 +1,7 @@
+import 'dart:async';
+
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:gucircle/components/mainAppBar.dart';
@@ -9,6 +13,42 @@ class ImportantNumbersScreen extends StatefulWidget {
 }
 
 class _ImportantNumbersScreenState extends State<ImportantNumbersScreen> {
+  late Timer _timer;
+  int _elapsedSeconds = 0;
+  FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    filteredNumbers.addAll(numbers);
+    // start timer
+    _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
+      _elapsedSeconds++;
+    });
+  }
+
+  @override
+  void dispose() {
+    saveElapsedTimeToDatabase();
+    _timer.cancel();
+    super.dispose();
+  }
+
+  Future<void> saveElapsedTimeToDatabase() async {
+    try {
+      User? user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        await firestore.collection('PagesScrolls').doc().set({
+          'page': 'ImportantNumbers',
+          'time': _elapsedSeconds,
+          'user': user.uid,
+        });
+      }
+    } catch (e) {
+      print("Error saving lost&found scroll time");
+    }
+  }
+
   List<Number> numbers = [
     Number(id: "0", number: "00201092226442", name: "clinic"),
     Number(id: "1", number: "01012345678", name: "hospital"),
@@ -24,12 +64,6 @@ class _ImportantNumbersScreenState extends State<ImportantNumbersScreen> {
   List<Number> filteredNumbers = [];
   TextEditingController searchController =
       TextEditingController(); // Controller for the search bar
-
-  @override
-  void initState() {
-    super.initState();
-    filteredNumbers.addAll(numbers);
-  }
 
   void search() {
     setState(() {
