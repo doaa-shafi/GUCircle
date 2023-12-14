@@ -110,6 +110,7 @@ class _UploadLostAndFoundScreenState extends State<UploadLostAndFoundScreen> {
               'message': "New Lost and Found post",
               'reference': docRef,
               "timestamp": Timestamp.now(),
+              "read": false
             }
           ]),
         });

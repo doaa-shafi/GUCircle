@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gucircle/components/MainAppBar.dart';
 import 'package:gucircle/post.dart';
 import 'package:gucircle/screens/LoastAndFoundCommentsScreen.dart';
 import 'package:gucircle/screens/QuestionsCommentsScreen.dart';
@@ -9,14 +10,20 @@ import 'package:gucircle/screens/UploadQuestionScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gucircle/components/PostCard.dart';
 
-class QuestionsScreen extends StatefulWidget {
+class OneQuestionScreen extends StatefulWidget {
   final Map<String, dynamic> post;
+  final String username;
+  final String postId;
   @override
-  const QuestionsScreen({super.key, required this.post});
-  State<QuestionsScreen> createState() => _QuestionsScreenState();
+  const OneQuestionScreen(
+      {super.key,
+      required this.post,
+      required this.username,
+      required this.postId});
+  State<OneQuestionScreen> createState() => _OneQuestionScreenState();
 }
 
-class _QuestionsScreenState extends State<QuestionsScreen> {
+class _OneQuestionScreenState extends State<OneQuestionScreen> {
   @override
   void initState() {
     super.initState();
@@ -52,21 +59,23 @@ class _QuestionsScreenState extends State<QuestionsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: RefreshIndicator(
-      onRefresh: refreshData,
-      child: Padding(
-          padding: const EdgeInsets.all(10.0),
+        appBar: MainAppBar(
+          appBar: AppBar(),
+          title: 'Academic Question',
+          goBack: true,
+        ),
+        body: Container(
           child: PostCard(
               collection: "AcademicQuestions",
-              postId: widget.post["id"],
+              postId: widget.postId,
               gotoComments: gotoComments,
-              username: widget.post["username"],
+              username: widget.username,
               text: widget.post['text'],
               likes: widget.post['likes'],
               comments: widget.post['comments'],
               attachedImg: widget.post['imgURL'] != ""
                   ? Image.network('${widget.post['imgURL']}')
-                  : null)),
-    ));
+                  : null),
+        ));
   }
 }

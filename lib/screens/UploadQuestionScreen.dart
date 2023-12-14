@@ -109,6 +109,7 @@ class _UploadQuestionScreenState extends State<UploadQuestionScreen> {
               'message': "New Academic question posted",
               'reference': docRef,
               "timestamp": Timestamp.now(),
+              "read": false
             }
           ]),
         });
