@@ -48,38 +48,56 @@ class NotificationCard extends StatelessWidget {
   Widget build(BuildContext context) {
     void handleTabForRejected() {
       setRead();
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text('Rejected'),
+            content: Text('An admin rejected your event.'),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context),
+                child: Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
     }
 
     Future<void> handleTabForApproved() async {
       setRead();
       try {
         DocumentSnapshot documentSnapshot = await ref!.get();
+        String collection = ref!.path.split('/').first;
+        print(collection);
+        if (collection == 'Events') {
+          if (documentSnapshot.exists) {
+            Map<String, dynamic> eventData =
+                documentSnapshot.data() as Map<String, dynamic>;
 
-        if (documentSnapshot.exists) {
-          Map<String, dynamic> eventData =
-              documentSnapshot.data() as Map<String, dynamic>;
+            String username = await getUsername(eventData['userId']);
+            collectionRef.doc(eventData['userId']).update({'pending': false});
 
-          String username = await getUsername(eventData['userId']);
-          collectionRef.doc(eventData['userId']).update({'pending': false});
-
-          goToEvent(context, username, eventData['Title'], eventData['text'],
-              eventData['imgURL'] == null ? "" : eventData['imgURL']);
-        } else {
-          showDialog(
-            context: context,
-            builder: (BuildContext context) {
-              return AlertDialog(
-                title: Text('Error'),
-                content: Text('An error occured. Please try again later.'),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(context),
-                    child: Text('OK'),
-                  ),
-                ],
-              );
-            },
-          );
+            goToEvent(context, username, eventData['Title'], eventData['text'],
+                eventData['imgURL'] == null ? "" : eventData['imgURL']);
+          } else {
+            showDialog(
+              context: context,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: Text('Error'),
+                  content: Text('An error occured. Please try again later.'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: Text('OK'),
+                    ),
+                  ],
+                );
+              },
+            );
+          }
         }
       } catch (e) {
         print("an error occured $e");

@@ -1,8 +1,9 @@
 import 'dart:async';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gucircle/components/MainAppBar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -10,8 +11,16 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  bool vegeterianSwitch = false;
-  bool veganSwitch = false;
+  late bool notificationSwitch;
+  late SharedPreferences prefs;
+
+  Future<void> getSwitchStates() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      notificationSwitch = prefs.getBool('notifications') ?? false;
+    });
+  }
+
   late Timer _timer;
   int _elapsedSeconds = 0;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -19,7 +28,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    // start timer
+    initializeSettings();
+  }
+
+  Future<void> initializeSettings() async {
+    await getSwitchStates();
+
+    // Now that prefs is initialized, you can proceed with other operations
     _timer = Timer.periodic(Duration(seconds: 1), (Timer timer) {
       _elapsedSeconds++;
     });
@@ -47,20 +62,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
+  Future<void> updateNotificationinPref(bool val) async {
+    await prefs.setBool('notifications', val);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        appBar: MainAppBar(appBar: AppBar(), title: "Settings", goBack: true),
         body: Column(
-      children: [
-        SwitchListTile(
-            title: Text('Notifications'),
-            value: vegeterianSwitch,
-            onChanged: (val) {
-              setState(() {
-                vegeterianSwitch = val;
-              });
-            }),
-      ],
-    ));
+          children: [
+            Container(
+              padding: EdgeInsets.all(20),
+              color: Color.fromARGB(47, 201, 220, 230),
+              child: SwitchListTile(
+                  title: Text(
+                    'Notifications',
+                    style: TextStyle(fontSize: 24),
+                  ),
+                  value: notificationSwitch,
+                  onChanged: (val) {
+                    setState(() {
+                      notificationSwitch = val;
+                      updateNotificationinPref(val);
+                    });
+                  }),
+            ),
+          ],
+        ));
   }
 }
