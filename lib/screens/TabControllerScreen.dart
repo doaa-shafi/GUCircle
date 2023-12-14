@@ -171,7 +171,7 @@ class _TabsControllerScreenState extends State<TabsControllerScreen> {
                                     ),
                                   ),
                                   const Text(
-                                    'Academic Questions',
+                                    'Academic',
                                     textAlign: TextAlign.center,
                                   )
                                 ],
