@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:gucircle/components/AdminEventCard.dart';
 import 'package:gucircle/components/EventCard.dart';
 import 'package:gucircle/components/mainAppBar.dart';
+import 'package:gucircle/classes/UserModel.dart';
+import 'package:provider/provider.dart';
 
 class AdminHome extends StatefulWidget {
   @override
@@ -26,6 +28,27 @@ class _AdminHomeState extends State<AdminHome> {
     String username = userSnapshot.get('username');
 
     return username;
+  }
+
+  Future<void> notifyAllUsers(
+      String userId, String message, DocumentReference? eventReference) async {
+    try {
+      final CollectionReference notificationsRef =
+          FirebaseFirestore.instance.collection('Notifications');
+      // notify all users
+      await notificationsRef.doc("all").update({
+        'notifications': FieldValue.arrayUnion([
+          {
+            'message': "New Event posted",
+            'timestamp': Timestamp.now(),
+            'read': false,
+            'reference': eventReference,
+          }
+        ]),
+      });
+    } catch (e) {
+      print('an error occured $e');
+    }
   }
 
   Future<void> notifyUser(
@@ -74,11 +97,27 @@ class _AdminHomeState extends State<AdminHome> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: MainAppBar(
-        appBar: AppBar(),
-        title: 'GUCircle - Admin',
-        goBack: false,
-      ),
+      appBar: AppBar(
+          title: Row(children: [
+            Image.asset('assets/logo.png', height: 40, width: 40),
+            const SizedBox(
+              width: 10,
+            ),
+            Text('GUCircle - Admin', style: TextStyle(color: Colors.white))
+          ]),
+          actions: <Widget>[
+            IconButton(
+                onPressed: () {
+                  Provider.of<UserModel>(context, listen: false).clearUser();
+                  Navigator.pop(context);
+                  Navigator.of(context).pushNamed('/loginRoute');
+                },
+                icon: Icon(Icons.logout))
+          ],
+          iconTheme:
+              const IconThemeData(color: Color.fromARGB(255, 83, 69, 22)),
+          backgroundColor: Colors.black,
+          automaticallyImplyLeading: false),
       body: RefreshIndicator(
         onRefresh: refreshData,
         child: FutureBuilder<QuerySnapshot>(
@@ -139,6 +178,10 @@ class _AdminHomeState extends State<AdminHome> {
                                   .update({'pending': false});
                               // Send notification
                               notifyUser(
+                                  eventData['userId'],
+                                  "Your event ${eventData['Title']} was approved!",
+                                  eventDoc.reference);
+                              notifyAllUsers(
                                   eventData['userId'],
                                   "Your event ${eventData['Title']} was approved!",
                                   eventDoc.reference);

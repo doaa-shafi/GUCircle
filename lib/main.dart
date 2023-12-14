@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gucircle/classes/FCMService.dart';
 import 'package:gucircle/classes/UserModel.dart';
 import 'package:gucircle/screens/AdminHome.dart';
 import 'package:gucircle/screens/ConfessionsScreen.dart';
@@ -7,6 +8,7 @@ import 'package:gucircle/screens/LostAndFoundScreen.dart';
 import 'package:gucircle/screens/NotificationsScreen.dart';
 import 'package:gucircle/screens/OfficesScreen.dart';
 import 'package:gucircle/screens/RatingsScreen.dart';
+import 'package:gucircle/screens/SettingsScreen.dart';
 import 'package:gucircle/screens/SignUpScreen.dart';
 import 'package:gucircle/screens/TabControllerScreen.dart';
 import 'package:gucircle/screens/UploadLostAndFoundScreen.dart';
@@ -17,6 +19,7 @@ import './screens/EventsScreen.dart';
 import './screens/LoginScreen.dart';
 import './screens/splashScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +28,8 @@ void main() async {
   } catch (e) {
     print('Error initializing Firebase here : $e');
   }
-
+  FCMService fcmService = FCMService();
+  await fcmService.setupFCM();
   runApp(
     ChangeNotifierProvider(
       create: (context) => UserModel(),
@@ -70,7 +74,8 @@ class MyApp extends StatelessWidget {
           '/mainPage': (ctx) => TabsControllerScreen(),
           '/adminHome': (ctx) => AdminHome(),
           '/notificationsRoute': (ctx) => NotificationsScreen(),
-          '/ratingsRoute': (ctx) => RatingsScreen()
+          '/ratingsRoute': (ctx) => RatingsScreen(),
+          '/settingsRoute': (ctx) => SettingsScreen()
         });
   }
 }
