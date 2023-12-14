@@ -92,18 +92,25 @@ class _UploadQuestionScreenState extends State<UploadQuestionScreen> {
         },
       );
       User? user = FirebaseAuth.instance.currentUser;
-      String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
+      // String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
       if (user != null) {
-        await firestore
-            .collection('AcademicQuestions')
-            .doc(user.uid + uniqueName)
-            .set({
+        DocumentReference docRef =
+            await firestore.collection('AcademicQuestions').add({
           'userId': user.uid,
           'text': postDesc.text,
           'imgURL': imgUrl,
           'likes': [],
           'comments': [],
           'date': DateTime.now()
+        });
+        await firestore.collection('Notifications').doc("all").update({
+          'notifications': FieldValue.arrayUnion([
+            {
+              'message': "New Academic question posted",
+              'reference': docRef,
+              "timestamp": Timestamp.now(),
+            }
+          ]),
         });
       }
 

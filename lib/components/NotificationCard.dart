@@ -56,6 +56,8 @@ class NotificationCard extends StatelessWidget {
         DocumentSnapshot documentSnapshot = await ref!.get();
 
         if (documentSnapshot.exists) {
+          print("documentSnapshot");
+          print(documentSnapshot);
           Map<String, dynamic> eventData =
               documentSnapshot.data() as Map<String, dynamic>;
 
