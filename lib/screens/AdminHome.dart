@@ -5,6 +5,7 @@ import 'package:gucircle/components/EventCard.dart';
 import 'package:gucircle/components/mainAppBar.dart';
 import 'package:gucircle/classes/UserModel.dart';
 import 'package:provider/provider.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class AdminHome extends StatefulWidget {
   @override
@@ -30,6 +31,50 @@ class _AdminHomeState extends State<AdminHome> {
     return username;
   }
 
+  Future sendNotificationToMultipleDevices() async {
+    final CollectionReference tokensRef =
+        FirebaseFirestore.instance.collection('NotificationTokens');
+    QuerySnapshot querySnapshot = await tokensRef.get();
+
+    List<DocumentSnapshot> documents = querySnapshot.docs;
+
+    List<String> deviceTokens = documents.map((e) => e.id).toList();
+
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    // Create the message data
+    Map<String, dynamic> messageData = {
+      'notification': {
+        'title': 'New Event Posted',
+        'body': 'Come check it out!',
+      },
+      'data': {
+        'key1': 'value1',
+        'key2': 'value2',
+      },
+      'registration_ids': deviceTokens,
+    };
+
+    Map<String, String> data = {
+      'title': 'New Event Posted',
+      'body': 'Come check it out!',
+    };
+    print("token is" + deviceTokens.first);
+    // Send the message
+
+    try {
+      await messaging.sendMessage(
+          to: deviceTokens.first,
+          data: data,
+          collapseKey: "key",
+          messageId: "key",
+          messageType: "type",
+          ttl: 1000);
+    } catch (e) {
+      print("error here ${e}");
+    }
+  }
+
   Future<void> notifyAllUsers(
       String userId, String message, DocumentReference? eventReference) async {
     try {
@@ -46,6 +91,7 @@ class _AdminHomeState extends State<AdminHome> {
           }
         ]),
       });
+      await sendNotificationToMultipleDevices();
     } catch (e) {
       print('an error occured $e');
     }
