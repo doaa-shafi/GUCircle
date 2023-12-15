@@ -37,6 +37,7 @@ class MainDrawer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, dynamic> userDetails = Provider.of<UserModel>(context).getUser;
     return Drawer(
       backgroundColor: Color.fromRGBO(64, 63, 63, 1),
       child: Container(
@@ -73,7 +74,7 @@ class MainDrawer extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(10),
                   child: Text(
-                    "username",
+                    userDetails['username'],
                     style: TextStyle(
                       fontSize: 25,
                       color: Colors.white,
