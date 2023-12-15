@@ -75,10 +75,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
             );
           },
         );
-      }
-      //else if (!email.text.trim().toLowerCase().endsWith("@guc.edu.eg") &&
-      //     !email.text.trim().toLowerCase().endsWith("@student.guc.edu.eg")) {
-      else if (!email.text.trim().toLowerCase().endsWith("")) {
+      } else if (!email.text.trim().toLowerCase().endsWith("@guc.edu.eg") &&
+          !email.text.trim().toLowerCase().endsWith("@student.guc.edu.eg")) {
+        // else if (!email.text.trim().toLowerCase().endsWith("")) {
         // Show an alert or handle the validation error as needed
         showDialog(
           context: context,

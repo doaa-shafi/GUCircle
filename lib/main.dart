@@ -20,22 +20,39 @@ import './screens/LoginScreen.dart';
 import './screens/splashScreen.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:permission_handler/permission_handler.dart';
 
-void main() async {
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   try {
     await Firebase.initializeApp();
+    print('Firebase initialized successfully.');
   } catch (e) {
-    print('Error initializing Firebase here : $e');
+    print('Error initializing Firebase: $e');
+    // Handle the error gracefully, for example, show an error dialog or exit the app.
+    return;
   }
-  FCMService fcmService = FCMService();
-  await fcmService.setupFCM();
-  runApp(
-    ChangeNotifierProvider(
-      create: (context) => UserModel(),
-      child: MyApp(),
-    ),
-  );
+
+  // Request location permissions
+  var status = await Permission.location.request();
+  if (status.isGranted) {
+    print("Location permission granted");
+    FCMService fcmService = FCMService();
+    await fcmService.setupFCM();
+
+    runApp(
+      ChangeNotifierProvider(
+        create: (context) => UserModel(),
+        child: MyApp(),
+      ),
+    );
+  } else {
+    // Permission denied.
+    print('Location permission denied');
+    // Handle the denial, for example, show a message to the user or exit the app.
+    return;
+  }
 }
 
 class MyApp extends StatelessWidget {

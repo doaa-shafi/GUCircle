@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gucircle/components/mainAppBar.dart';
 import '../office.dart';
+import 'package:geolocator/geolocator.dart';
 
 class OfficesScreen extends StatefulWidget {
   @override
@@ -53,47 +54,65 @@ class _OfficesScreenState extends State<OfficesScreen> {
         id: "0",
         name: "DR Milad",
         location: "c7-201",
-        directions: "Directions for c7-201"),
+        directions: "Directions for c7-201",
+        latitude: 29.986451059754053,
+        longitude: 31.438525087402475),
     Office(
         id: "1",
         name: "DR Mervat",
         location: "c7-202",
-        directions: "Directions for c7-202"),
+        directions: "Directions for c7-202",
+        latitude: 29.986451059754053,
+        longitude: 31.438525087402475),
     Office(
         id: "2",
         name: "DR HYTHEM",
         location: "c7-203",
-        directions: "Directions for c7-203"),
+        directions: "Directions for c7-203",
+        latitude: 29.986451059754053,
+        longitude: 31.438525087402475),
     Office(
         id: "3",
         name: "DR HYTHEM",
         location: "c7-203",
-        directions: "Directions for c7-203"),
+        directions: "Directions for c7-203",
+        latitude: 29.986451059754053,
+        longitude: 31.438525087402475),
     Office(
         id: "4",
         name: "DR HYTHEM",
         location: "c7-203",
-        directions: "Directions for c7-203"),
+        directions: "Directions for c7-203",
+        latitude: 29.986451059754053,
+        longitude: 31.438525087402475),
     Office(
         id: "5",
         name: "DR HYTHEM",
         location: "c7-203",
-        directions: "Directions for c7-203"),
+        directions: "Directions for c7-203",
+        latitude: 29.986451059754053,
+        longitude: 31.438525087402475),
     Office(
         id: "6",
         name: "DR HYTHEM",
         location: "c7-203",
-        directions: "Directions for c7-203"),
+        directions: "Directions for c7-203",
+        latitude: 29.986451059754053,
+        longitude: 31.438525087402475),
     Office(
         id: "7",
         name: "DR HYTHEM",
         location: "c7-203",
-        directions: "Directions for c7-203"),
+        directions: "Directions for c7-203",
+        latitude: 29.986451059754053,
+        longitude: 31.438525087402475),
     Office(
         id: "8",
         name: "DR Amr",
         location: "c7-203",
-        directions: "Directions for c7-203"),
+        directions: "Directions for c7-203",
+        latitude: 29.986451059754053,
+        longitude: 31.438525087402475),
   ];
 
   // Keep track of selected office for directions
@@ -110,6 +129,15 @@ class _OfficesScreenState extends State<OfficesScreen> {
               office.location.toLowerCase().contains(query.toLowerCase()))
           .toList();
     });
+  }
+
+  Future<double> getDistance(double lat, double lon) async {
+    Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high);
+    double distance = await Geolocator.distanceBetween(
+        position.latitude, position.longitude, lat, lon);
+    print(position.latitude.toString() + " " + position.longitude.toString());
+    return distance;
   }
 
   void clearSearch() {
@@ -175,7 +203,28 @@ class _OfficesScreenState extends State<OfficesScreen> {
                         Card(
                           child: ListTile(
                             title: Text("Directions"),
-                            subtitle: Text(office.directions),
+                            subtitle: FutureBuilder<double>(
+                              future: getDistance(
+                                  office.latitude, office.longitude),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Text(
+                                      "Calculating distance..."); // Placeholder text while waiting.
+                                } else if (snapshot.hasError) {
+                                  return Text("Error: ${snapshot.error}");
+                                } else {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text("Directions: ${office.directions}"),
+                                      Text("Distance: ${snapshot.data} meters"),
+                                    ],
+                                  );
+                                }
+                              },
+                            ),
                           ),
                         ),
                       Divider(),
