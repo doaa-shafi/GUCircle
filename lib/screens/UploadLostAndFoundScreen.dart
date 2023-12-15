@@ -95,16 +95,24 @@ class _UploadLostAndFoundScreenState extends State<UploadLostAndFoundScreen> {
       User? user = FirebaseAuth.instance.currentUser;
       String uniqueName = DateTime.now().millisecondsSinceEpoch.toString();
       if (user != null) {
-        await firestore
-            .collection('LostAndFound')
-            .doc(user.uid + uniqueName)
-            .set({
+        DocumentReference docRef =
+            await firestore.collection('LostAndFound').add({
           'userId': user.uid,
           'text': postDesc.text,
           'imgURL': imgUrl,
           'likes': [],
           'comments': [],
           'date': DateTime.now()
+        });
+        await firestore.collection('Notifications').doc("all").update({
+          'notifications': FieldValue.arrayUnion([
+            {
+              'message': "New Lost and Found post",
+              'reference': docRef,
+              "timestamp": Timestamp.now(),
+              "read": false
+            }
+          ]),
         });
       }
 

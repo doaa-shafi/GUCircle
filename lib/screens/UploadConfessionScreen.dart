@@ -76,13 +76,14 @@ class _UploadConfessionScreenState extends State<UploadConfessionScreen> {
                 'message': "New confession posted",
                 'reference': docRef,
                 "timestamp": Timestamp.now(),
+                "read": false
               }
             ]),
           });
         } else {
           DocumentReference docRef =
               await firestore.collection('Confessions').add({
-            'user': "Anonymous",    
+            'user': "Anonymous",
             'text': ConfessionText.text,
             'likes': 0,
             'comments': 0,

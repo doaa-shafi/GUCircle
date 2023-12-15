@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:gucircle/screens/OneEventScreen.dart';
 import 'package:intl/intl.dart';
+import 'package:gucircle/screens/OneQuestionScreen.dart';
 
 class NotificationCard extends StatelessWidget {
   final String message;
@@ -71,33 +72,55 @@ class NotificationCard extends StatelessWidget {
         DocumentSnapshot documentSnapshot = await ref!.get();
         String collection = ref!.path.split('/').first;
         print(collection);
-        if (collection == 'Events') {
-          if (documentSnapshot.exists) {
+
+        if (documentSnapshot.exists) {
+          print(documentSnapshot.reference.id);
+          if (collection == 'Events') {
             Map<String, dynamic> eventData =
                 documentSnapshot.data() as Map<String, dynamic>;
-
             String username = await getUsername(eventData['userId']);
             collectionRef.doc(eventData['userId']).update({'pending': false});
-
             goToEvent(context, username, eventData['Title'], eventData['text'],
                 eventData['imgURL'] == null ? "" : eventData['imgURL']);
-          } else {
-            showDialog(
-              context: context,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: Text('Error'),
-                  content: Text('An error occured. Please try again later.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: Text('OK'),
-                    ),
-                  ],
-                );
-              },
-            );
+          } else if (collection == 'AcademicQuestions') {
+            Map<String, dynamic> postData =
+                documentSnapshot.data() as Map<String, dynamic>;
+            String username = await getUsername(postData['userId']);
+            collectionRef.doc(postData['userId']).update({'pending': false});
+            Navigator.of(context).push(MaterialPageRoute(builder: (ctxDummy) {
+              return OneQuestionScreen(
+                  post: postData,
+                  username: username,
+                  postId: documentSnapshot.reference.id.toString());
+            }));
+          } else if (collection == 'LostAndFound') {
+            Map<String, dynamic> postData =
+                documentSnapshot.data() as Map<String, dynamic>;
+            String username = await getUsername(postData['userId']);
+            collectionRef.doc(postData['userId']).update({'pending': false});
+            Navigator.of(context).push(MaterialPageRoute(builder: (ctxDummy) {
+              return OneQuestionScreen(
+                  post: postData,
+                  username: username,
+                  postId: documentSnapshot.reference.id.toString());
+            }));
           }
+        } else {
+          showDialog(
+            context: context,
+            builder: (BuildContext context) {
+              return AlertDialog(
+                title: Text('Error'),
+                content: Text('An error occured. Please try again later.'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(context),
+                    child: Text('OK'),
+                  ),
+                ],
+              );
+            },
+          );
         }
       } catch (e) {
         print("an error occured $e");
