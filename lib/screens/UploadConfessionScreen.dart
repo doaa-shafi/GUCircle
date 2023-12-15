@@ -95,6 +95,7 @@ class _UploadConfessionScreenState extends State<UploadConfessionScreen> {
                 'message': "New confession posted",
                 'reference': docRef,
                 "timestamp": Timestamp.now(),
+                "read": false
               }
             ]),
           });
