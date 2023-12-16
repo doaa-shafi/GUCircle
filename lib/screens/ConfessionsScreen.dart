@@ -18,9 +18,9 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
   final CollectionReference collectionRef =
       FirebaseFirestore.instance.collection('Confessions');
 
-  //List<Event> eventsList = [];
+  
   Future<QuerySnapshot> fetchConfessions() async {
-    return collectionRef.orderBy('timestamp').get();
+    return collectionRef.orderBy('timestamp',descending: true).get();
   }
 
   Future<String> getUsername(String userId) async {
@@ -81,7 +81,7 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
   gotoUpload(BuildContext myContext) {
     Navigator.of(myContext).push(MaterialPageRoute(builder: (ctxDummy) {
       return UploadConfessionScreen();
-    }));
+    })).then((value) => setState(() {}));
   }
 
   @override
