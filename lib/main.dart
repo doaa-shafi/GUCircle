@@ -28,6 +28,8 @@ Future<void> main() async {
   try {
     await Firebase.initializeApp();
     print('Firebase initialized successfully.');
+    FCMService fcmService = FCMService();
+    await fcmService.setupFCM();
   } catch (e) {
     print('Error initializing Firebase: $e');
     // Handle the error gracefully, for example, show an error dialog or exit the app.
@@ -38,8 +40,6 @@ Future<void> main() async {
   var status = await Permission.location.request();
   if (status.isGranted) {
     print("Location permission granted");
-    FCMService fcmService = FCMService();
-    await fcmService.setupFCM();
 
     runApp(
       ChangeNotifierProvider(
