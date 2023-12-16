@@ -96,20 +96,21 @@ class MainDrawer extends StatelessWidget {
                 saveButtonClickToDatabase('Notifications');
               },
             ),
-            ListTile(
-              tileColor: const Color.fromRGBO(72, 71, 71, 1),
-              leading: const Icon(
-                Icons.person,
-                color: Color.fromRGBO(181, 178, 178, 1),
-                size: 30,
-              ),
-              title: const Text("Edit Profile",
-                  style: TextStyle(color: Colors.white, fontSize: 20)),
-              onTap: () {
-                Navigator.of(context).pushNamed('/');
-                saveButtonClickToDatabase('EditProfile');
-              },
-            ),
+            // ),
+            // ListTile(
+            //   tileColor: const Color.fromRGBO(72, 71, 71, 1),
+            //   leading: const Icon(
+            //     Icons.person,
+            //     color: Color.fromRGBO(181, 178, 178, 1),
+            //     size: 30,
+            //   ),
+            //   title: const Text("Edit Profile",
+            //       style: TextStyle(color: Colors.white, fontSize: 20)),
+            //   onTap: () {
+            //     Navigator.of(context).pushNamed('/');
+            //     saveButtonClickToDatabase('EditProfile');
+            //   },
+            // ),
             ListTile(
               tileColor: const Color.fromRGBO(72, 71, 71, 1),
               leading: const Icon(
@@ -151,6 +152,9 @@ class MainDrawer extends StatelessWidget {
                 Navigator.of(context).pushNamed('/officesRoute');
                 saveButtonClickToDatabase('Maps');
               },
+            ),
+            Container(
+              height: 35,
             ),
             ListTile(
               tileColor: Color.fromRGBO(72, 71, 71, 1),

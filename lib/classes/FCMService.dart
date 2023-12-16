@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final navigatorKey = GlobalKey<NavigatorState>();
 
@@ -9,33 +10,41 @@ class FCMService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
   Future<void> setupFCM() async {
-    // Request permission for iOS devices
-    NotificationSettings settings = await _firebaseMessaging.requestPermission(
-      alert: true,
-      badge: true,
-      sound: true,
-    );
+    // Check if notifications are enabled in SharedPreferences
+    bool notificationsEnabled = await getNotificationStatus();
 
-    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-      print('Permission granted');
-    } else {
-      print('Permission denied');
+    if (notificationsEnabled) {
+      // Request permission for iOS devices
+      NotificationSettings settings =
+          await _firebaseMessaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+
+      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+        print('Permission granted');
+      } else {
+        print('Permission denied');
+      }
+
+      // get token
+      final token = await _firebaseMessaging.getToken();
+      try {
+        await addTokenToDatabase(token.toString());
+      } catch (e) {
+        print("error adding token to database ${e}");
+      }
+      print("token is:" + token.toString());
+
+      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+        print('Received FCM message: ${message.notification?.body}');
+        handleMessage(message);
+      });
+
+      // Handle incoming messages
+      await initPushNotification();
     }
-
-    // get token
-    final token = await _firebaseMessaging.getToken();
-
-    await addTokenToDatabase(token.toString());
-
-    print("token is:" + token.toString());
-
-    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-      print('Received FCM message: ${message.notification?.body}');
-      handleMessage(message);
-    });
-
-    // Handle incoming messages
-    await initPushNotification();
   }
 
   void handleMessage(RemoteMessage? message) {
@@ -52,7 +61,7 @@ class FCMService {
     }
   }
 
-// Background message handler
+  // Background message handler
   Future<void> _firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
     print("Handling background message: ${message.messageId}");
@@ -79,10 +88,10 @@ class FCMService {
       final DocumentSnapshot tokenDoc = await tokenRef.doc(token).get();
 
       if (!tokenDoc.exists) {
-        await tokenRef.doc(token).set({});
+        await tokenRef.doc(token).set({'token': token});
       }
     } catch (e) {
-      print('an error occured $e');
+      print('an error occured while adding token $e');
     }
   }
 
@@ -91,4 +100,10 @@ class FCMService {
   //   String? token = await _firebaseMessaging.getToken();
   //   return token ?? '';
   // }
+
+  Future<bool> getNotificationStatus() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('notifications') ??
+        true; // Default to true if not found
+  }
 }
