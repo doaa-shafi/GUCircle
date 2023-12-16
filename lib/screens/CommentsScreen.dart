@@ -45,7 +45,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
   Future<QuerySnapshot> fetchComments() async {
     return commentsRef
         .where('confession', isEqualTo: widget.id)
-        // .orderBy('timestamp')
+        .orderBy('timestamp',descending: true)
         .get();
   }
 

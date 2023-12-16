@@ -41,7 +41,6 @@ class _ConfessionCardState extends State<ConfessionCard> {
   }
 
   gotoComments(BuildContext myContext) {
-    print(widget.id);
     Navigator.of(myContext).push(MaterialPageRoute(builder: (ctxDummy) {
       return CommentsScreen(
         username: widget.username,
