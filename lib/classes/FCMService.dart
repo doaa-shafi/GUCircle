@@ -11,53 +11,59 @@ class FCMService {
 
   Future<void> setupFCM() async {
     // Check if notifications are enabled in SharedPreferences
+    // bool notificationsEnabled = await getNotificationStatus();
+
+    // if (notificationsEnabled) {
+    // Request permission for iOS devices
+    NotificationSettings settings = await _firebaseMessaging.requestPermission(
+      alert: true,
+      badge: true,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('Permission granted');
+    } else {
+      print('Permission denied');
+    }
+
+    // get token
+    final token = await _firebaseMessaging.getToken();
+    try {
+      await addTokenToDatabase(token.toString());
+    } catch (e) {
+      print("error adding token to database ${e}");
+    }
+    print("token is:" + token.toString());
+
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      print('Received FCM message: ${message.notification?.body}');
+      handleMessage(message);
+    });
+
+    // Handle incoming messages
+    await initPushNotification();
+  }
+
+  void handleMessage(RemoteMessage? message) async {
+    if (message == null) return;
+
+    //Check if notifications are enabled in SharedPreferences
     bool notificationsEnabled = await getNotificationStatus();
 
     if (notificationsEnabled) {
-      // Request permission for iOS devices
-      NotificationSettings settings =
-          await _firebaseMessaging.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-      );
-
-      if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-        print('Permission granted');
+      // check for credentials
+      User? user = FirebaseAuth.instance.currentUser;
+      print("User is:" + user.toString());
+      if (user == null) {
+        // no user is logged in, so open the log in page
+        navigatorKey.currentState?.pushNamed('/');
       } else {
-        print('Permission denied');
+        navigatorKey.currentState?.pushNamed('/notificationsRoute');
+        print("notifications route" + navigatorKey.currentState!.toString());
       }
-
-      // get token
-      final token = await _firebaseMessaging.getToken();
-      try {
-        await addTokenToDatabase(token.toString());
-      } catch (e) {
-        print("error adding token to database ${e}");
-      }
-      print("token is:" + token.toString());
-
-      FirebaseMessaging.onMessage.listen((RemoteMessage message) {
-        print('Received FCM message: ${message.notification?.body}');
-        handleMessage(message);
-      });
-
-      // Handle incoming messages
-      await initPushNotification();
-    }
-  }
-
-  void handleMessage(RemoteMessage? message) {
-    if (message == null) return;
-
-    // check for credentials
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user == null) {
-      // no user is logged in, so open the log in page
-      navigatorKey.currentState?.pushNamed('/');
     } else {
-      navigatorKey.currentState?.pushNamed('/notificationsRoute');
-      print("notifications route");
+      print("notifications muted");
     }
   }
 
@@ -65,7 +71,13 @@ class FCMService {
   Future<void> _firebaseMessagingBackgroundHandler(
       RemoteMessage message) async {
     print("Handling background message: ${message.messageId}");
-    navigatorKey.currentState?.pushNamed('/notificationsRoute');
+    bool notificationsEnabled = await getNotificationStatus();
+
+    if (notificationsEnabled) {
+      navigatorKey.currentState?.pushNamed('/notificationsRoute');
+    } else {
+      print("notifications muted");
+    }
   }
 
   Future initPushNotification() async {

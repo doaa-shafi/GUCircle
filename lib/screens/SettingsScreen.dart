@@ -69,6 +69,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> updateTokens(bool val) async {
+    FCMService fcmService = FCMService();
+
     if (val == false) // don't want notifications
     {
       final CollectionReference tokensRef =
@@ -78,9 +80,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
       final token = await _firebaseMessaging.getToken();
       // Delete Firestore document
       await tokensRef.doc(token.toString()).delete();
+      await fcmService.setupFCM();
     } else {
       // want notification
-      FCMService fcmService = FCMService();
       await fcmService.setupFCM();
     }
   }
@@ -105,7 +107,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       notificationSwitch = val;
                       updateNotificationinPref(val);
                     });
-                    updateTokens(val);
+                    //updateTokens(val);
                   }),
             ),
           ],
