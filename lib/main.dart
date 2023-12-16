@@ -22,6 +22,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -76,6 +77,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: primaryBlack,
         ),
+        navigatorKey: navigatorKey,
         initialRoute: '/',
         routes: {
           '/': (ctx) => SplashScreen(),
