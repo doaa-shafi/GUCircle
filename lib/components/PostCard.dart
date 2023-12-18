@@ -37,6 +37,8 @@ class _PostCardState extends State<PostCard> {
     print(widget.postId);
     try {
       User? user = FirebaseAuth.instance.currentUser;
+      print(widget.collection);
+      print(widget.postId);
       if (user != null) {
         if (widget.likes.contains(user.uid)) {
           //already liked so unlike
@@ -64,6 +66,7 @@ class _PostCardState extends State<PostCard> {
       }
     } catch (e) {
       print("Error trying to like post");
+      print(e);
       setState(() {
         error = true;
       });

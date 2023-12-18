@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,13 +17,12 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
   final CollectionReference collectionRef =
       FirebaseFirestore.instance.collection('Confessions');
 
-  
   Future<QuerySnapshot> fetchConfessions() async {
-    return collectionRef.orderBy('timestamp',descending: true).get();
+    return collectionRef.orderBy('timestamp', descending: true).get();
   }
 
   Future<String> getUsername(String userId) async {
-    if(userId=="Anonymous"){
+    if (userId == "Anonymous") {
       return "Anonymous";
     }
     final CollectionReference usersRef =
@@ -77,7 +75,6 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
     }
   }
 
-  
   gotoUpload(BuildContext myContext) {
     Navigator.of(myContext).push(MaterialPageRoute(builder: (ctxDummy) {
       return UploadConfessionScreen();
@@ -103,7 +100,7 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
               return Text('Error: ${snapshot.error}');
             } else if (snapshot.data!.docs.isEmpty) {
               return Container(
-                padding: EdgeInsets.fromLTRB(0, 20, 0,0),
+                padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
                 child: Column(
                   children: [
                     GestureDetector(
@@ -122,7 +119,7 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
                       ),
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height/3,
+                      height: MediaQuery.of(context).size.height / 3,
                     ),
                     const Center(
                         child: Text(
@@ -158,7 +155,8 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
                             confessionDoc.data() as Map<String, dynamic>;
 
                         return FutureBuilder<String>(
-                          future: getUsername(confessionData['user'].toString()),
+                          future:
+                              getUsername(confessionData['user'].toString()),
                           builder: (context, usernameSnapshot) {
                             if (usernameSnapshot.connectionState ==
                                 ConnectionState.waiting) {
@@ -173,12 +171,11 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
                               return Padding(
                                 padding: const EdgeInsets.all(10.0),
                                 child: ConfessionCard(
-                                  username: usernameSnapshot.data.toString(),
-                                  text: confessionData['text'],
-                                  likes: confessionData['likes'],
-                                  comments: confessionData['comments'],
-                                  id:confessionDoc.reference
-                                ),
+                                    username: usernameSnapshot.data.toString(),
+                                    text: confessionData['text'],
+                                    likes: confessionData['likes'],
+                                    comments: confessionData['comments'],
+                                    id: confessionDoc.reference),
                               );
                             }
                           },
@@ -187,13 +184,11 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
                     ),
                   ),
                 ],
-      
               );
             }
           },
         ),
       ),
     );
-    
   }
 }

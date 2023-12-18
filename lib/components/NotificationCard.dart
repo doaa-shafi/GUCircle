@@ -5,6 +5,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:gucircle/screens/OneConfessionScreen.dart';
 import 'package:gucircle/screens/OneEventScreen.dart';
+import 'package:gucircle/screens/OneLostAndFoundScreen.dart';
 import 'package:intl/intl.dart';
 import 'package:gucircle/screens/OneQuestionScreen.dart';
 
@@ -37,7 +38,7 @@ class NotificationCard extends StatelessWidget {
   }
 
   Future<String> getUsername(String userId) async {
-    if(userId=="Anonymous"){
+    if (userId == "Anonymous") {
       return "Anonymous";
     }
     final CollectionReference usersRef =
@@ -103,7 +104,7 @@ class NotificationCard extends StatelessWidget {
             String username = await getUsername(postData['userId']);
             //collectionRef.doc(postData['userId']).update({'pending': false});
             Navigator.of(context).push(MaterialPageRoute(builder: (ctxDummy) {
-              return OneQuestionScreen(
+              return OneLostAndFoundScreen(
                   post: postData,
                   username: username,
                   postId: documentSnapshot.reference.id.toString());

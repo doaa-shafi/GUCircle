@@ -4,7 +4,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gucircle/components/MainAppBar.dart';
 import 'package:gucircle/post.dart';
-import 'package:gucircle/screens/LoastAndFoundCommentsScreen.dart';
+import 'package:gucircle/screens/LostAndFoundCommentsScreen.dart';
 import 'package:gucircle/screens/RatingsCommentsScreen.dart';
 import 'package:gucircle/screens/UploadRatingScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

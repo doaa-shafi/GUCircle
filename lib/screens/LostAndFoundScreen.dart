@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gucircle/screens/LoastAndFoundCommentsScreen.dart';
+import 'package:gucircle/screens/LostAndFoundCommentsScreen.dart';
 import 'package:gucircle/screens/UploadLostAndFoundScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gucircle/components/PostCard.dart';
@@ -89,7 +89,7 @@ class _LostAndFoundScreenState extends State<LostAndFoundScreen> {
 
   gotoComments(BuildContext myContext, String postId, List<dynamic> comments) {
     Navigator.of(myContext).push(MaterialPageRoute(builder: (ctxDummy) {
-      return CommentsScreen(comments: comments, postId: postId);
+      return LostAndFoundCommentsScreen(comments: comments, postId: postId);
     }));
   }
 

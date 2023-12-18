@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:gucircle/post.dart';
-import 'package:gucircle/screens/LoastAndFoundCommentsScreen.dart';
+import 'package:gucircle/screens/LostAndFoundCommentsScreen.dart';
 import 'package:gucircle/screens/QuestionsCommentsScreen.dart';
 import 'package:gucircle/screens/UploadQuestionScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';

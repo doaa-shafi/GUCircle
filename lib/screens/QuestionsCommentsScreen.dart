@@ -57,7 +57,7 @@ class _QuestionsCommentsScreenState extends State<QuestionsCommentsScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Sending Request...'),
+            title: Text('Posting...'),
             content: Text('Please wait...'),
             actions: [],
           );
@@ -112,8 +112,7 @@ class _QuestionsCommentsScreenState extends State<QuestionsCommentsScreen> {
                       },
                     ),
                   )
-                : SizedBox(
-                    height: 650,
+                : Expanded(
                     child: Align(
                         heightFactor: 1.0,
                         alignment: Alignment.center,
