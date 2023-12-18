@@ -109,10 +109,21 @@ class _QuestionsCommentsScreenState extends State<QuestionsCommentsScreen> {
                         return FutureBuilder<String>(
                           future: getUsername(widget.comments[index]['user']),
                           builder: (context, usernameSnapshot) {
-                            return CommentCard(
-                              text: widget.comments[index]['text'],
-                              username: usernameSnapshot.data.toString(),
-                            );
+                            if (usernameSnapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return ListTile(
+                                title: CircularProgressIndicator(),
+                              );
+                            } else if (usernameSnapshot.hasError) {
+                              return ListTile(
+                                title: Text('Error: ${usernameSnapshot.error}'),
+                              );
+                            } else {
+                              return CommentCard(
+                                text: widget.comments[index]['text'],
+                                username: usernameSnapshot.data.toString(),
+                              );
+                            }
                           },
                         );
                       },
