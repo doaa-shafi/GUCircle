@@ -101,6 +101,7 @@ class _UploadLostAndFoundScreenState extends State<UploadEventScreen> {
           'text': eventDesc.text,
           'pending': true,
           'imgURL': imgUrl,
+          'timestamp': DateTime.now()
         });
       }
 
