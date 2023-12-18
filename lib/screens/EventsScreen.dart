@@ -51,7 +51,10 @@ class _EventsScreenState extends State<EventsScreen> {
 
   //List<Event> eventsList = [];
   Future<QuerySnapshot> fetchEvents() async {
-    return collectionRef.where('pending', isEqualTo: false).get();
+    return collectionRef
+        .where('pending', isEqualTo: false)
+        .orderBy('timestamp', descending: true)
+        .get();
   }
 
   Future<String> getUsername(String userId) async {
@@ -86,11 +89,14 @@ class _EventsScreenState extends State<EventsScreen> {
             } else if (snapshot.hasError) {
               return Text('Error: ${snapshot.error}');
             } else if (snapshot.data!.docs.isEmpty) {
-              return const Center(
-                  child: Text(
-                'No Events yet',
-                style: TextStyle(fontSize: 20),
-              ));
+              return Container(
+                  height: MediaQuery.of(context).size.height,
+                child: const Center(
+                    child: Text(
+                  'No Events yet',
+                  style: TextStyle(fontSize: 20),
+                )),
+              );
             } else {
               return ListView(
                 children: snapshot.data!.docs.map((DocumentSnapshot eventDoc) {
