@@ -34,6 +34,10 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
     return username;
   }
 
+  void _update(bool update) {
+    setState(() {});
+  }
+
   Future<void> refreshData() async {
     setState(() {});
   }
@@ -171,11 +175,13 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
                               return Padding(
                                 padding: const EdgeInsets.all(10.0),
                                 child: ConfessionCard(
-                                    username: usernameSnapshot.data.toString(),
-                                    text: confessionData['text'],
-                                    likes: confessionData['likes'],
-                                    comments: confessionData['comments'],
-                                    id: confessionDoc.reference),
+                                  username: usernameSnapshot.data.toString(),
+                                  text: confessionData['text'],
+                                  likes: confessionData['likes'],
+                                  comments: confessionData['comments'],
+                                  id: confessionDoc.reference,
+                                  update: _update,
+                                ),
                               );
                             }
                           },

@@ -31,15 +31,11 @@ class _CommentCardState extends State<CommentCard> {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const CircleAvatar(
-              radius: 16.0,
-              backgroundColor: Color.fromARGB(20, 1, 1, 1),
-              child: CircleAvatar(
-                radius: 15.0,
-                backgroundColor: Colors.white,
-                child: Image(
-                  image: AssetImage('assets/anonymous.png'),
-                ),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(50.0),
+              child: Image.asset(
+                'assets/default-user.png',
+                height: 40,
               ),
             ),
             const SizedBox(

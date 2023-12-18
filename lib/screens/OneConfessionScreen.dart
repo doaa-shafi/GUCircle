@@ -40,7 +40,9 @@ class _OneConfessionScreenState extends State<OneConfessionScreen> {
 
     return username;
   }
-
+  void _update(bool update) {
+    setState(() {});
+  }
   Future<void> refreshData() async {
     setState(() {});
   }
@@ -104,7 +106,8 @@ class _OneConfessionScreenState extends State<OneConfessionScreen> {
               text: widget.post['text'],
               likes: widget.post['likes'],
               comments: widget.post['comments'],
-              id: widget.docRef),
+              id: widget.docRef,
+              update: _update,),
         )));
   }
 }
