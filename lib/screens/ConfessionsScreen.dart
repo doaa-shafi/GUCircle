@@ -35,7 +35,9 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
 
     return username;
   }
-
+  void _update(bool update) {
+    setState(() {});
+  }
   Future<void> refreshData() async {
     setState(() {});
   }
@@ -177,7 +179,8 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
                                   text: confessionData['text'],
                                   likes: confessionData['likes'],
                                   comments: confessionData['comments'],
-                                  id:confessionDoc.reference
+                                  id:confessionDoc.reference,
+                                  update: _update,
                                 ),
                               );
                             }

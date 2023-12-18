@@ -12,6 +12,7 @@ class ConfessionCard extends StatefulWidget {
   final int likes;
   final int comments;
   final DocumentReference id;
+  final ValueChanged<bool> update;
 
   ConfessionCard({
     required this.username,
@@ -19,6 +20,7 @@ class ConfessionCard extends StatefulWidget {
     required this.likes,
     required this.comments,
     required this.id,
+    required this.update
   });
 
   @override
@@ -49,7 +51,7 @@ class _ConfessionCardState extends State<ConfessionCard> {
         comments: widget.comments,
         id: widget.id,
       );
-    }));
+    })).then((value) => widget.update(true) );
   }
 
   Future<void> checkLikedOrNot() async {

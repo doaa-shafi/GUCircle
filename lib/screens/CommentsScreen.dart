@@ -65,6 +65,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
     return username;
   }
 
+  void _update(bool update) {
+    setState(() {});
+  }
   Future<void> refreshData() async {
     setState(() {});
   }
@@ -82,7 +85,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Error'),
-            content: Text('Cannot upload an empty confession'),
+            content: Text('Cannot upload an empty comment'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -128,7 +131,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
           .allMatches(comment.text)
           .map((z) => z.group(0)!.substring(1, z.group(0)!.length - 1))
           .toList();
-      print(tags);
+      if(!tags.isEmpty){
       QuerySnapshot taggedUsers = await firestore
           .collection('Users')
           .where('username', whereIn: tags)
@@ -173,7 +176,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
             ]
           });
         }
-      });
+      });}
+      
       Navigator.pop(context);
       showDialog(
         context: context,
@@ -218,7 +222,8 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   text: widget.text,
                   likes: widget.likes,
                   comments: comments,
-                  id: widget.id),
+                  id: widget.id,
+                  update: _update,),
             ),
             FutureBuilder<QuerySnapshot>(
               future: fetchComments(),
