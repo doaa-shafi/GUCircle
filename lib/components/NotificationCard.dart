@@ -37,6 +37,9 @@ class NotificationCard extends StatelessWidget {
   }
 
   Future<String> getUsername(String userId) async {
+    if(userId=="Anonymous"){
+      return "Anonymous";
+    }
     final CollectionReference usersRef =
         FirebaseFirestore.instance.collection('Users');
 
