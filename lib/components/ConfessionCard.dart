@@ -14,14 +14,13 @@ class ConfessionCard extends StatefulWidget {
   final DocumentReference id;
   final ValueChanged<bool> update;
 
-  ConfessionCard({
-    required this.username,
-    required this.text,
-    required this.likes,
-    required this.comments,
-    required this.id,
-    required this.update
-  });
+  ConfessionCard(
+      {required this.username,
+      required this.text,
+      required this.likes,
+      required this.comments,
+      required this.id,
+      required this.update});
 
   @override
   State<ConfessionCard> createState() => _ConfessionCardState();
@@ -33,11 +32,11 @@ class _ConfessionCardState extends State<ConfessionCard> {
       FirebaseFirestore.instance.collection('Users');
   bool error = false;
   bool liked = false;
-  int likes=0;
+  int likes = 0;
 
   @override
   void initState() {
-    likes=widget.likes;
+    likes = widget.likes;
     checkLikedOrNot();
     super.initState();
   }
@@ -51,7 +50,7 @@ class _ConfessionCardState extends State<ConfessionCard> {
         comments: widget.comments,
         id: widget.id,
       );
-    })).then((value) => widget.update(true) );
+    })).then((value) => widget.update(true));
   }
 
   Future<void> checkLikedOrNot() async {
@@ -62,13 +61,11 @@ class _ConfessionCardState extends State<ConfessionCard> {
             .doc(user.uid) // Document which contains the products array
             .get()
             .then((doc) {
-              Map<String, dynamic> docData =
-                      doc.data() as Map<String, dynamic>;
-              setState(() {
-                liked=docData['likedConfessions'].contains(widget.id);
-              });
-            });
-      
+          Map<String, dynamic> docData = doc.data() as Map<String, dynamic>;
+          setState(() {
+            liked = docData['likedConfessions'].contains(widget.id);
+          });
+        });
       }
     } catch (e) {
       print("Error sending request: $e");
@@ -84,12 +81,12 @@ class _ConfessionCardState extends State<ConfessionCard> {
           'likedConfessions': FieldValue.arrayUnion([widget.id]),
         });
         await firestore
-          .collection('Confessions')
-          .doc(widget.id.id)
-          .set({'likes': FieldValue.increment(1)},SetOptions(merge: true));
+            .collection('Confessions')
+            .doc(widget.id.id)
+            .set({'likes': FieldValue.increment(1)}, SetOptions(merge: true));
         setState(() {
           liked = true;
-          likes+=1;
+          likes += 1;
         });
       }
     } catch (e) {
@@ -106,12 +103,12 @@ class _ConfessionCardState extends State<ConfessionCard> {
           'likedConfessions': FieldValue.arrayRemove([widget.id]),
         });
         await firestore
-          .collection('Confessions')
-          .doc(widget.id.id)
-          .set({'likes': FieldValue.increment(-1)},SetOptions(merge: true));
+            .collection('Confessions')
+            .doc(widget.id.id)
+            .set({'likes': FieldValue.increment(-1)}, SetOptions(merge: true));
         setState(() {
           liked = false;
-          likes-=1;
+          likes -= 1;
         });
       }
     } catch (e) {
@@ -138,12 +135,14 @@ class _ConfessionCardState extends State<ConfessionCard> {
                 Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    CircleAvatar(
-                      child: Image(
-                        image: AssetImage('assets/anonymous.png'),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(50.0),
+                      child: Image.asset(
+                        'assets/default-user.png',
+                        height: 50,
                       ),
-                      backgroundColor: Colors.white,
                     ),
+                    SizedBox(width: 10,),
                     Text(
                       widget.username,
                       style: TextStyle(
@@ -195,7 +194,7 @@ class _ConfessionCardState extends State<ConfessionCard> {
                             Icons.message,
                             color: Color.fromARGB(255, 255, 208, 0),
                           ),
-                          onPressed:()=>{gotoComments(context)},
+                          onPressed: () => {gotoComments(context)},
                         ),
                         SizedBox(
                           width: 5,
