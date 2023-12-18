@@ -65,7 +65,10 @@ class _QuestionsCommentsScreenState extends State<QuestionsCommentsScreen> {
       );
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        await firestore.collection('LostAndFound').doc(widget.postId).update({
+        await firestore
+            .collection('AcademicQuestions')
+            .doc(widget.postId)
+            .update({
           "comments": FieldValue.arrayUnion([
             {"user": user.uid, "text": newComment.text}
           ])
