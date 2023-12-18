@@ -25,9 +25,12 @@ class _QuestionsCommentsScreenState extends State<QuestionsCommentsScreen> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Future<String> getUsername(String userId) async {
-    print('hi');
-    print(userId);
-    String username = 'yasmine';
+    final CollectionReference usersRef =
+        FirebaseFirestore.instance.collection('Users');
+
+    DocumentSnapshot userSnapshot = await usersRef.doc(userId).get();
+    String username = userSnapshot.get('username');
+
     return username;
   }
 
