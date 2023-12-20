@@ -3,7 +3,9 @@ import 'dart:math';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:gucircle/screens/OneConfessionScreen.dart';
 import 'package:gucircle/screens/OneEventScreen.dart';
+import 'package:gucircle/screens/OneLostAndFoundScreen.dart';
 import 'package:intl/intl.dart';
 import 'package:gucircle/screens/OneQuestionScreen.dart';
 
@@ -36,6 +38,9 @@ class NotificationCard extends StatelessWidget {
   }
 
   Future<String> getUsername(String userId) async {
+    if (userId == "Anonymous") {
+      return "Anonymous";
+    }
     final CollectionReference usersRef =
         FirebaseFirestore.instance.collection('Users');
 
@@ -97,12 +102,26 @@ class NotificationCard extends StatelessWidget {
             Map<String, dynamic> postData =
                 documentSnapshot.data() as Map<String, dynamic>;
             String username = await getUsername(postData['userId']);
-            collectionRef.doc(postData['userId']).update({'pending': false});
+            //collectionRef.doc(postData['userId']).update({'pending': false});
             Navigator.of(context).push(MaterialPageRoute(builder: (ctxDummy) {
-              return OneQuestionScreen(
+              return OneLostAndFoundScreen(
                   post: postData,
                   username: username,
                   postId: documentSnapshot.reference.id.toString());
+            }));
+          } else if (collection == 'Confessions') {
+            Map<String, dynamic> postData =
+                documentSnapshot.data() as Map<String, dynamic>;
+            print("Data: " + postData.toString());
+            String username = await getUsername(postData['user']);
+            print("username: " + username);
+            //collectionRef.doc(postData['userId']).update({'pending': false});
+            Navigator.of(context).push(MaterialPageRoute(builder: (ctxDummy) {
+              return OneConfessionScreen(
+                post: postData,
+                username: username,
+                docRef: documentSnapshot.reference,
+              );
             }));
           }
         } else {

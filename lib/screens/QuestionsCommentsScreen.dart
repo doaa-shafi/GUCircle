@@ -25,9 +25,12 @@ class _QuestionsCommentsScreenState extends State<QuestionsCommentsScreen> {
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Future<String> getUsername(String userId) async {
-    print('hi');
-    print(userId);
-    String username = 'yasmine';
+    final CollectionReference usersRef =
+        FirebaseFirestore.instance.collection('Users');
+
+    DocumentSnapshot userSnapshot = await usersRef.doc(userId).get();
+    String username = userSnapshot.get('username');
+
     return username;
   }
 
@@ -57,7 +60,7 @@ class _QuestionsCommentsScreenState extends State<QuestionsCommentsScreen> {
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text('Sending Request...'),
+            title: Text('Posting...'),
             content: Text('Please wait...'),
             actions: [],
           );
@@ -65,7 +68,10 @@ class _QuestionsCommentsScreenState extends State<QuestionsCommentsScreen> {
       );
       User? user = FirebaseAuth.instance.currentUser;
       if (user != null) {
-        await firestore.collection('LostAndFound').doc(widget.postId).update({
+        await firestore
+            .collection('AcademicQuestions')
+            .doc(widget.postId)
+            .update({
           "comments": FieldValue.arrayUnion([
             {"user": user.uid, "text": newComment.text}
           ])
@@ -103,17 +109,27 @@ class _QuestionsCommentsScreenState extends State<QuestionsCommentsScreen> {
                         return FutureBuilder<String>(
                           future: getUsername(widget.comments[index]['user']),
                           builder: (context, usernameSnapshot) {
-                            return CommentCard(
-                              text: widget.comments[index]['text'],
-                              username: usernameSnapshot.data.toString(),
-                            );
+                            if (usernameSnapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return ListTile(
+                                title: CircularProgressIndicator(),
+                              );
+                            } else if (usernameSnapshot.hasError) {
+                              return ListTile(
+                                title: Text('Error: ${usernameSnapshot.error}'),
+                              );
+                            } else {
+                              return CommentCard(
+                                text: widget.comments[index]['text'],
+                                username: usernameSnapshot.data.toString(),
+                              );
+                            }
                           },
                         );
                       },
                     ),
                   )
-                : SizedBox(
-                    height: 650,
+                : Expanded(
                     child: Align(
                         heightFactor: 1.0,
                         alignment: Alignment.center,

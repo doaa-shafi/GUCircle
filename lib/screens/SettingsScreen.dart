@@ -2,8 +2,10 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:gucircle/classes/FCMService.dart';
 import 'package:gucircle/components/MainAppBar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -11,13 +13,13 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
-  late bool notificationSwitch;
+  bool notificationSwitch = true;
   late SharedPreferences prefs;
 
   Future<void> getSwitchStates() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
-      notificationSwitch = prefs.getBool('notifications') ?? false;
+      notificationSwitch = prefs.getBool('notifications') ?? true;
     });
   }
 
@@ -66,6 +68,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
     await prefs.setBool('notifications', val);
   }
 
+  Future<void> updateTokens(bool val) async {
+    FCMService fcmService = FCMService();
+
+    if (val == false) // don't want notifications
+    {
+      final CollectionReference tokensRef =
+          FirebaseFirestore.instance.collection('NotificationTokens');
+      final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
+      // get token
+      final token = await _firebaseMessaging.getToken();
+      // Delete Firestore document
+      await tokensRef.doc(token.toString()).delete();
+      await fcmService.setupFCM();
+    } else {
+      // want notification
+      await fcmService.setupFCM();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -86,6 +107,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       notificationSwitch = val;
                       updateNotificationinPref(val);
                     });
+                    //updateTokens(val);
                   }),
             ),
           ],

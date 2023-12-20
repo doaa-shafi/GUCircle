@@ -1,4 +1,3 @@
-
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -18,13 +17,12 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
   final CollectionReference collectionRef =
       FirebaseFirestore.instance.collection('Confessions');
 
-  //List<Event> eventsList = [];
   Future<QuerySnapshot> fetchConfessions() async {
-    return collectionRef.orderBy('timestamp').get();
+    return collectionRef.orderBy('timestamp', descending: true).get();
   }
 
   Future<String> getUsername(String userId) async {
-    if(userId=="Anonymous"){
+    if (userId == "Anonymous") {
       return "Anonymous";
     }
     final CollectionReference usersRef =
@@ -34,6 +32,10 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
     String username = userSnapshot.get('username');
 
     return username;
+  }
+
+  void _update(bool update) {
+    setState(() {});
   }
 
   Future<void> refreshData() async {
@@ -77,11 +79,10 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
     }
   }
 
-  
   gotoUpload(BuildContext myContext) {
     Navigator.of(myContext).push(MaterialPageRoute(builder: (ctxDummy) {
       return UploadConfessionScreen();
-    }));
+    })).then((value) => setState(() {}));
   }
 
   @override
@@ -103,7 +104,7 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
               return Text('Error: ${snapshot.error}');
             } else if (snapshot.data!.docs.isEmpty) {
               return Container(
-                padding: EdgeInsets.fromLTRB(0, 20, 0,0),
+                padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
                 child: Column(
                   children: [
                     GestureDetector(
@@ -122,7 +123,7 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
                       ),
                     ),
                     SizedBox(
-                      height: MediaQuery.of(context).size.height/3,
+                      height: MediaQuery.of(context).size.height / 3,
                     ),
                     const Center(
                         child: Text(
@@ -158,7 +159,8 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
                             confessionDoc.data() as Map<String, dynamic>;
 
                         return FutureBuilder<String>(
-                          future: getUsername(confessionData['user'].toString()),
+                          future:
+                              getUsername(confessionData['user'].toString()),
                           builder: (context, usernameSnapshot) {
                             if (usernameSnapshot.connectionState ==
                                 ConnectionState.waiting) {
@@ -177,7 +179,8 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
                                   text: confessionData['text'],
                                   likes: confessionData['likes'],
                                   comments: confessionData['comments'],
-                                  id:confessionDoc.reference
+                                  id: confessionDoc.reference,
+                                  update: _update,
                                 ),
                               );
                             }
@@ -187,13 +190,11 @@ class _ConfessionsScreenState extends State<ConfessionsScreen> {
                     ),
                   ),
                 ],
-      
               );
             }
           },
         ),
       ),
     );
-    
   }
 }

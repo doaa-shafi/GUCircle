@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -27,20 +26,16 @@ class _CommentCardState extends State<CommentCard> {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.fromLTRB(20,0, 10, 0),
+        padding: EdgeInsets.fromLTRB(20, 0, 10, 0),
         margin: const EdgeInsets.fromLTRB(0, 0, 0, 10),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const CircleAvatar(
-              radius: 16.0,
-              backgroundColor: Color.fromARGB(20, 1, 1, 1),
-              child:  CircleAvatar(
-                radius: 15.0,
-                backgroundColor: Colors.white,
-                child: Image(
-                  image: AssetImage('assets/anonymous.png'),
-                ),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(50.0),
+              child: Image.asset(
+                'assets/default-user.png',
+                height: 40,
               ),
             ),
             const SizedBox(
@@ -66,7 +61,8 @@ class _CommentCardState extends State<CommentCard> {
                   ),
                   Text(
                     widget.text,
-                    style:const TextStyle(fontSize: 16,color: Color.fromARGB(180, 1, 1, 1)),
+                    style: const TextStyle(
+                        fontSize: 16, color: Color.fromARGB(180, 1, 1, 1)),
                   ),
                   const SizedBox(
                     height: 10,

@@ -146,7 +146,7 @@ class _UploadQuestionScreenState extends State<UploadQuestionScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Lost & Found'),
+        title: Text('Academic Questions'),
         backgroundColor: Colors.black,
       ),
       body: SingleChildScrollView(

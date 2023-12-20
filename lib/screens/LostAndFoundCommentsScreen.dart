@@ -8,30 +8,29 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-class CommentsScreen extends StatefulWidget {
+class LostAndFoundCommentsScreen extends StatefulWidget {
   final String postId;
   final List<dynamic> comments;
-  const CommentsScreen(
+  const LostAndFoundCommentsScreen(
       {super.key, required this.postId, required this.comments});
 
   @override
-  State<CommentsScreen> createState() => _CommentsScreenState();
+  State<LostAndFoundCommentsScreen> createState() =>
+      _LostAndFoundCommentsScreenState();
 }
 
-class _CommentsScreenState extends State<CommentsScreen> {
+class _LostAndFoundCommentsScreenState
+    extends State<LostAndFoundCommentsScreen> {
   bool error = false;
   final newComment = TextEditingController();
   FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Future<String> getUsername(String userId) async {
-    print('hi');
-    print(userId);
-    String username = 'yasmine';
-    // final CollectionReference usersRef =
-    //     FirebaseFirestore.instance.collection('Users');
+    final CollectionReference usersRef =
+        FirebaseFirestore.instance.collection('Users');
 
-    // DocumentSnapshot userSnapshot = await usersRef.doc(userId).get();
-    // String username = userSnapshot.get('username');
+    DocumentSnapshot userSnapshot = await usersRef.doc(userId).get();
+    String username = userSnapshot.get('username');
 
     return username;
   }
@@ -108,17 +107,27 @@ class _CommentsScreenState extends State<CommentsScreen> {
                         return FutureBuilder<String>(
                           future: getUsername(widget.comments[index]['user']),
                           builder: (context, usernameSnapshot) {
-                            return CommentCard(
-                              text: widget.comments[index]['text'],
-                              username: usernameSnapshot.data.toString(),
-                            );
+                            if (usernameSnapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return ListTile(
+                                title: CircularProgressIndicator(),
+                              );
+                            } else if (usernameSnapshot.hasError) {
+                              return ListTile(
+                                title: Text('Error: ${usernameSnapshot.error}'),
+                              );
+                            } else {
+                              return CommentCard(
+                                text: widget.comments[index]['text'],
+                                username: usernameSnapshot.data.toString(),
+                              );
+                            }
                           },
                         );
                       },
                     ),
                   )
-                : SizedBox(
-                    height: 650,
+                : Expanded(
                     child: Align(
                         heightFactor: 1.0,
                         alignment: Alignment.center,

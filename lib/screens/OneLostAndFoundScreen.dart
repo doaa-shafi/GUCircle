@@ -6,24 +6,25 @@ import 'package:gucircle/components/MainAppBar.dart';
 import 'package:gucircle/post.dart';
 import 'package:gucircle/screens/LostAndFoundCommentsScreen.dart';
 import 'package:gucircle/screens/QuestionsCommentsScreen.dart';
+import 'package:gucircle/screens/UploadLostAndFoundScreen.dart';
 import 'package:gucircle/screens/UploadQuestionScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gucircle/components/PostCard.dart';
 
-class OneQuestionScreen extends StatefulWidget {
+class OneLostAndFoundScreen extends StatefulWidget {
   final Map<String, dynamic> post;
   final String username;
   final String postId;
   @override
-  const OneQuestionScreen(
+  const OneLostAndFoundScreen(
       {super.key,
       required this.post,
       required this.username,
       required this.postId});
-  State<OneQuestionScreen> createState() => _OneQuestionScreenState();
+  State<OneLostAndFoundScreen> createState() => _OneLostAndFoundScreenState();
 }
 
-class _OneQuestionScreenState extends State<OneQuestionScreen> {
+class _OneLostAndFoundScreenState extends State<OneLostAndFoundScreen> {
   @override
   void initState() {
     super.initState();
@@ -46,13 +47,13 @@ class _OneQuestionScreenState extends State<OneQuestionScreen> {
 
   gotoUpload(BuildContext myContext) {
     Navigator.of(myContext).push(MaterialPageRoute(builder: (ctxDummy) {
-      return UploadQuestionScreen();
+      return UploadLostAndFoundScreen();
     }));
   }
 
   gotoComments(BuildContext myContext, String postId, List<dynamic> comments) {
     Navigator.of(myContext).push(MaterialPageRoute(builder: (ctxDummy) {
-      return QuestionsCommentsScreen(comments: comments, postId: postId);
+      return LostAndFoundCommentsScreen(comments: comments, postId: postId);
     }));
   }
 
@@ -61,13 +62,13 @@ class _OneQuestionScreenState extends State<OneQuestionScreen> {
     return Scaffold(
         appBar: MainAppBar(
           appBar: AppBar(),
-          title: 'Academic Question',
+          title: 'Lost And Found',
           goBack: true,
         ),
         body: SingleChildScrollView(
           child: Container(
             child: PostCard(
-                collection: "AcademicQuestions",
+                collection: "LostAndFound",
                 postId: widget.postId,
                 gotoComments: gotoComments,
                 username: widget.username,

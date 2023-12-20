@@ -22,12 +22,15 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:permission_handler/permission_handler.dart';
 
+final navigatorKey = GlobalKey<NavigatorState>();
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
     await Firebase.initializeApp();
     print('Firebase initialized successfully.');
+    FCMService fcmService = FCMService();
+    await fcmService.setupFCM();
   } catch (e) {
     print('Error initializing Firebase: $e');
     // Handle the error gracefully, for example, show an error dialog or exit the app.
@@ -38,8 +41,6 @@ Future<void> main() async {
   var status = await Permission.location.request();
   if (status.isGranted) {
     print("Location permission granted");
-    FCMService fcmService = FCMService();
-    await fcmService.setupFCM();
 
     runApp(
       ChangeNotifierProvider(
@@ -76,6 +77,7 @@ class MyApp extends StatelessWidget {
         theme: ThemeData(
           primarySwatch: primaryBlack,
         ),
+        navigatorKey: navigatorKey,
         initialRoute: '/',
         routes: {
           '/': (ctx) => SplashScreen(),

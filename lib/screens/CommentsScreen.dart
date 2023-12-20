@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'package:flutter/material.dart';
@@ -30,13 +32,17 @@ class CommentsScreen extends StatefulWidget {
 
 class _CommentsScreenState extends State<CommentsScreen> {
   final comment = TextEditingController();
-  int comments=0;
+  String hintText =
+      'Add a comment...\n You can tag your friends with @username#';
+  int comments = 0;
   FirebaseFirestore firestore = FirebaseFirestore.instance;
   final CollectionReference confessionsRef =
       FirebaseFirestore.instance.collection('Confessions');
 
   final CollectionReference commentsRef =
       FirebaseFirestore.instance.collection('Comments');
+
+  User? user = FirebaseAuth.instance.currentUser;
 
   Future<DocumentSnapshot> fetchConfession() async {
     return confessionsRef.doc(widget.id.id).get();
@@ -45,7 +51,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
   Future<QuerySnapshot> fetchComments() async {
     return commentsRef
         .where('confession', isEqualTo: widget.id)
-        // .orderBy('timestamp')
+        .orderBy('timestamp', descending: true)
         .get();
   }
 
@@ -59,15 +65,16 @@ class _CommentsScreenState extends State<CommentsScreen> {
     return username;
   }
 
+  void _update(bool update) {
+    setState(() {});
+  }
   Future<void> refreshData() async {
     setState(() {});
   }
 
-  late Future<QuerySnapshot> fetchedComments;
   @override
   void initState() {
-    comments=widget.comments;
-    fetchedComments = fetchComments();
+    comments = widget.comments;
     super.initState();
   }
 
@@ -78,7 +85,7 @@ class _CommentsScreenState extends State<CommentsScreen> {
         builder: (BuildContext context) {
           return AlertDialog(
             title: Text('Error'),
-            content: Text('Cannot upload an empty confession'),
+            content: Text('Cannot upload an empty comment'),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(context),
@@ -117,8 +124,60 @@ class _CommentsScreenState extends State<CommentsScreen> {
           .doc(widget.id.id)
           .set({'comments': FieldValue.increment(1)}, SetOptions(merge: true));
       setState(() {
-        comments+=1;
+        comments += 1;
       });
+      final re = RegExp(r'@(\w+)#');
+      final tags = re
+          .allMatches(comment.text)
+          .map((z) => z.group(0)!.substring(1, z.group(0)!.length - 1))
+          .toList();
+      if(!tags.isEmpty){
+      QuerySnapshot taggedUsers = await firestore
+          .collection('Users')
+          .where('username', whereIn: tags)
+          .get();
+      print(taggedUsers);
+      final username = await getUsername(user.uid);
+      print(username);
+      taggedUsers.docs.forEach((doc) async {
+        print('here');
+        final CollectionReference notificationsRef =
+            FirebaseFirestore.instance.collection('Notifications');
+
+        // Check if the document exists
+        final DocumentSnapshot userDoc =
+            await notificationsRef.doc(doc.reference.id.toString()).get();
+
+        if (userDoc.exists) {
+          // If the document exists, update it
+          await firestore
+              .collection('Notifications')
+              .doc(doc.reference.id.toString())
+              .update({
+            'notifications': FieldValue.arrayUnion([
+              {
+                'message': "Your friend " + username + " tagged you",
+                'reference': widget.id,
+                "timestamp": Timestamp.now(),
+                "read": false
+              }
+            ]),
+          });
+        } else {
+          // If the document doesn't exist, create it
+          await notificationsRef.doc(doc.reference.id.toString()).set({
+            'notifications': [
+              {
+                'message': "Your friend " + username + " tagged you",
+                'reference': widget.id,
+                "timestamp": Timestamp.now(),
+                "read": false
+              }
+            ]
+          });
+        }
+      });}
+      
       Navigator.pop(context);
       showDialog(
         context: context,
@@ -132,7 +191,6 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   // Navigate back to the previous page
                   Navigator.pop(context);
                   comment.clear();
-                  initState();
                   refreshData();
                 },
                 child: Text('OK'),
@@ -163,8 +221,9 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   username: widget.username,
                   text: widget.text,
                   likes: widget.likes,
-                  comments:comments,
-                  id: widget.id),
+                  comments: comments,
+                  id: widget.id,
+                  update: _update,),
             ),
             FutureBuilder<QuerySnapshot>(
               future: fetchComments(),
@@ -231,10 +290,10 @@ class _CommentsScreenState extends State<CommentsScreen> {
                   color: Colors.white),
               child: TextField(
                 keyboardType: TextInputType.multiline,
-                minLines: 3, //Normal textInputField will be displayed
+                minLines: 1, //Normal textInputField will be displayed
                 maxLines: 5,
                 decoration: InputDecoration(
-                  hintText: 'Add a comment...',
+                  hintText: hintText,
                   border: InputBorder.none,
                   prefixIcon: IconButton(
                     icon: FaIcon(
